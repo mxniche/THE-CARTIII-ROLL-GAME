@@ -1,0 +1,2960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>THE HUNTER: Chicken Roll</title>
+
+<style>
+html,body{
+  margin:0;
+  padding:0;
+  background:#000;
+  overflow:hidden;
+  font-family:'Courier New',monospace;
+  color:#eee;
+  user-select:none;
+}
+
+#gameCanvas{
+  display:block;
+  background:#000;
+  cursor:none;
+}
+
+.overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:rgba(0,0,0,.92);
+  z-index:10;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.title{
+  font-size:54px;
+  color:#c40000;
+  letter-spacing:6px;
+  text-shadow:0 0 20px #c40000;
+  margin-bottom:4px;
+}
+
+.subtitle{
+  font-size:20px;
+  color:#999;
+  letter-spacing:3px;
+  margin-bottom:24px;
+}
+
+.desc{
+  max-width:560px;
+  font-size:15px;
+  color:#bbb;
+  line-height:1.5;
+  margin-bottom:10px;
+}
+
+.small{
+  font-size:12px;
+  color:#666;
+  margin-bottom:26px;
+}
+
+button.mainBtn{
+  background:#1a0000;
+  color:#ff3b3b;
+  border:2px solid #ff3b3b;
+  font-family:'Courier New',monospace;
+  font-size:18px;
+  letter-spacing:3px;
+  padding:14px 34px;
+  cursor:pointer;
+  transition:.15s;
+}
+
+button.mainBtn:hover{
+  background:#ff3b3b;
+  color:#000;
+}
+
+#hud{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  padding:14px 20px;
+  box-sizing:border-box;
+  z-index:5;
+  pointer-events:none;
+}
+
+#hudTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+#hudTitle{
+  font-size:16px;
+  color:#ff5a5a;
+  letter-spacing:2px;
+}
+
+#hudObjective{
+  font-size:12px;
+  color:#aaa;
+  margin-top:4px;
+  max-width:320px;
+}
+
+#hudIngredients{
+  font-size:15px;
+  color:#eee;
+  text-align:right;
+}
+
+#hudControls{
+  font-size:11px;
+  color:#555;
+  text-align:right;
+  margin-top:4px;
+}
+
+#promptBox{
+  position:absolute;
+  bottom:90px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.75);
+  border:1px solid #ff3b3b;
+  color:#fff;
+  padding:10px 18px;
+  font-size:14px;
+  z-index:6;
+  letter-spacing:1px;
+}
+
+#toast{
+  position:absolute;
+  bottom:40px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#ffd27a;
+  font-size:15px;
+  z-index:6;
+  text-shadow:0 0 6px #000;
+  opacity:0;
+  transition:opacity .3s;
+}
+
+#craftBox,#eatBox{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(10,0,0,.92);
+  border:2px solid #ff3b3b;
+  padding:26px 40px;
+  text-align:center;
+  z-index:8;
+}
+
+#craftBox h2,#eatBox h2{
+  color:#ff5a5a;
+  letter-spacing:3px;
+  margin-top:0;
+}
+
+.ingLine{
+  font-size:15px;
+  margin:6px 0;
+  color:#ccc;
+}
+
+.check{
+  color:#6bff6b;
+}
+
+#progressWrap{
+  width:260px;
+  height:16px;
+  border:1px solid #ff5a5a;
+  margin:16px auto;
+}
+
+#progressBar{
+  height:100%;
+  width:0%;
+  background:#ff3b3b;
+}
+
+#vignette{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:4;
+  box-shadow:inset 0 0 0 0 rgba(200,0,0,0);
+  transition:box-shadow .15s linear;
+}
+
+#flashOverlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#fff;
+  opacity:0;
+  pointer-events:none;
+  z-index:20;
+}
+
+#gameOverScreen,#winScreen{
+  z-index:15;
+}
+
+.goTitle{
+  font-size:60px;
+  color:#ff1414;
+  letter-spacing:8px;
+  text-shadow:0 0 30px #ff0000;
+}
+
+.winTitle{
+  font-size:48px;
+  color:#ffd23f;
+  letter-spacing:5px;
+  text-shadow:0 0 20px #ffae00;
+}
+
+/* TOUCH CONTROLS */
+
+#touchControls{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:7;
+  pointer-events:none;
+  display:none;
+}
+
+body.touch-device #touchControls{
+  display:block;
+}
+
+#joystickBase{
+  position:absolute;
+  left:28px;
+  bottom:28px;
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  background:rgba(255,255,255,.06);
+  border:2px solid rgba(255,90,90,.5);
+  pointer-events:auto;
+  touch-action:none;
+}
+
+#joystickKnob{
+  position:absolute;
+  left:45px;
+  top:45px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:rgba(255,90,90,.55);
+  border:1px solid rgba(255,150,150,.8);
+  pointer-events:none;
+}
+
+#interactBtn{
+  position:absolute;
+  right:34px;
+  bottom:42px;
+  width:92px;
+  height:92px;
+  border-radius:50%;
+  background:rgba(255,59,59,.18);
+  border:2px solid #ff3b3b;
+  color:#ff8a8a;
+  font-family:'Courier New',monospace;
+  font-size:15px;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  pointer-events:auto;
+  touch-action:none;
+}
+
+#interactBtn.pressed{
+  background:rgba(255,59,59,.5);
+}
+
+body.touch-device #hudControls{
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<div id="vignette"></div>
+<div id="flashOverlay"></div>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="overlay">
+  <div class="title">THE HUNTER</div>
+  <div class="subtitle">CHICKEN ROLL HORROR</div>
+
+  <div class="desc">
+    Find the ingredients. Make the roll. Eat it before the Hunter finds you.
+  </div>
+
+  <div class="small">
+    Original procedural dark-trap soundtrack — no copyrighted audio used.
+  </div>
+
+  <button class="mainBtn" id="startBtn">
+    ENTER THE NIGHT
+  </button>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameOverScreen" class="overlay hidden">
+
+  <div class="goTitle">
+    CAUGHT.
+  </div>
+
+  <div class="desc">
+    The Hunter got you before you finished the chicken roll.
+  </div>
+
+  <button class="mainBtn" id="retryBtn">
+    RUN IT BACK
+  </button>
+
+</div>
+
+<!-- WIN -->
+<div id="winScreen" class="overlay hidden">
+
+  <div class="winTitle">
+    YOU WIN 🌯🏆
+  </div>
+
+  <div class="desc">
+    The Hunter has been defeated by the most powerful force known to humanity: a completed chicken roll.
+  </div>
+
+  <button class="mainBtn" id="playAgainBtn">
+    RUN IT BACK
+  </button>
+
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+
+  <div id="hudTop">
+
+    <div>
+
+      <div id="hudTitle">
+        🌯 THE HUNTER
+      </div>
+
+      <div id="hudObjective">
+        Objective: Find the chicken, sauce and wrap.
+      </div>
+
+    </div>
+
+    <div>
+
+      <div id="hudIngredients">
+        Ingredients: 0/3
+      </div>
+
+      <div id="hudControls">
+        WASD / Arrow Keys = Move &nbsp;|&nbsp; E = Interact
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="promptBox" class="hidden"></div>
+<div id="toast"></div>
+
+<!-- TOUCH CONTROLS -->
+
+<div id="touchControls">
+
+  <div id="joystickBase">
+    <div id="joystickKnob"></div>
+  </div>
+
+  <div id="interactBtn">
+    E<br>INTERACT
+  </div>
+
+</div>
+
+<!-- CRAFTING -->
+
+<div id="craftBox" class="hidden">
+
+  <h2>
+    CHICKEN ROLL ASSEMBLY
+  </h2>
+
+  <div class="ingLine">
+    Chicken <span class="check">✓</span>
+  </div>
+
+  <div class="ingLine">
+    Sauce <span class="check">✓</span>
+  </div>
+
+  <div class="ingLine">
+    Wrap <span class="check">✓</span>
+  </div>
+
+  <button class="mainBtn" id="makeRollBtn">
+    MAKE CHICKEN ROLL
+  </button>
+
+</div>
+
+<!-- EATING -->
+
+<div id="eatBox" class="hidden">
+
+  <h2>
+    EATING...
+  </h2>
+
+  <div id="progressWrap">
+    <div id="progressBar"></div>
+  </div>
+
+  <div class="small">
+    Stay still. The Hunter is still out there.
+  </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   THE HUNTER: CHICKEN ROLL
+   Single-file browser horror game.
+========================================================= */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+const TILE = 40;
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+const mapLayout = [
+
+"1111111111111111111111111111111111111111",
+"1000000000001000000000000010000000000001",
+"1011111110101011111011111010111111101101",
+"1010000000101000001010001010100000101001",
+"1010111110101111101011101011101110101011",
+"1000100000001000101010001000101010001011",
+"1110100111111101101011101111101011101011",
+"1000100100000001101000001000001011101001",
+"1011100101111101101111111011111011101101",
+"1010000101000001000000001010000000101001",
+"1010111101011111111110101010111111101011",
+"1010100001000000000010101010100000001011",
+"1010101111011111111010101010101111101011",
+"1000101000010000001010001000001000101001",
+"1111101011111011101011101111101011101011",
+"1000001010000010001000001000001000001001",
+"1011111010111010101111101011111011111011",
+"1010000010100010101000001000000010001001",
+"1010111110101110101011111111011110101011",
+"1000100000101000001000000000100000101001",
+"1KKK1011101011111111111011110101110101K1",
+"1KKK1000101000000000000100000101000001K1",
+"1KKK1011101111111111101101111101111111K1",
+"1KKK1010000000000000101000000000000000K1",
+"1KKKKKKKKKKKKK1011111111111011111111KKK1",
+"1000000000000100000000000010000000000001",
+"1111111111111111111111111111111111111111"
+
+];
+
+const MAP_ROWS = mapLayout.length;
+const MAP_COLS = mapLayout[0].length;
+
+function tileAt(col,row){
+
+  if(
+    row < 0 ||
+    row >= MAP_ROWS ||
+    col < 0 ||
+    col >= MAP_COLS
+  ){
+    return 1;
+  }
+
+  return mapLayout[row][col];
+}
+
+function isWall(col,row){
+  return tileAt(col,row) === '1';
+}
+
+function isKitchen(col,row){
+  return tileAt(col,row) === 'K';
+}
+
+function randomFloorTile(excludeKitchen){
+
+  let tries = 0;
+
+  while(tries < 500){
+
+    const c =
+      1 + Math.floor(
+        Math.random() * (MAP_COLS - 2)
+      );
+
+    const r =
+      1 + Math.floor(
+        Math.random() * (MAP_ROWS - 2)
+      );
+
+    const t = tileAt(c,r);
+
+    if(
+      t === '0' ||
+      (!excludeKitchen && t === 'K')
+    ){
+      return {
+        col:c,
+        row:r
+      };
+    }
+
+    tries++;
+  }
+
+  return {
+    col:2,
+    row:2
+  };
+}
+
+
+/* =========================================================
+   GAME STATE
+========================================================= */
+
+const GameState = {
+
+  MENU:'menu',
+  PLAYING:'playing',
+  CRAFTING:'crafting',
+  EATING:'eating',
+  GAMEOVER:'gameover',
+  WIN:'win'
+
+};
+
+let state = GameState.MENU;
+
+let ingredientsCollected = {
+  chicken:false,
+  sauce:false,
+  wrap:false
+};
+
+let hasRoll = false;
+
+let eatProgress = 0;
+let eatingActive = false;
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+const player = {
+
+  x:0,
+  y:0,
+
+  radius:12,
+
+  speed:190,
+
+  vx:0,
+  vy:0,
+
+  flashlightAngle:0
+
+};
+
+function resetPlayer(){
+
+  const spot = randomFloorTile(true);
+
+  player.x =
+    spot.col * TILE + TILE / 2;
+
+  player.y =
+    spot.row * TILE + TILE / 2;
+
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+const keys = {};
+
+window.addEventListener('keydown',(e)=>{
+
+  keys[e.key.toLowerCase()] = true;
+
+  if(e.key === 'e' || e.key === 'E'){
+    handleInteract();
+  }
+
+  if(e.key === 'Escape'){
+    togglePause();
+  }
+
+});
+
+window.addEventListener('keyup',(e)=>{
+
+  keys[e.key.toLowerCase()] = false;
+
+});
+
+let paused = false;
+
+function togglePause(){
+
+  if(state !== GameState.PLAYING){
+    return;
+  }
+
+  paused = !paused;
+
+}
+
+
+/* =========================================================
+   TOUCH CONTROLS
+========================================================= */
+
+const isTouchDevice =
+  ('ontouchstart' in window) ||
+  (navigator.maxTouchPoints > 0);
+
+if(isTouchDevice){
+
+  document.body.classList.add('touch-device');
+
+}
+
+const joystick = {
+
+  active:false,
+  pointerId:null,
+  dx:0,
+  dy:0
+
+};
+
+function setupJoystick(){
+
+  const base =
+    document.getElementById('joystickBase');
+
+  const knob =
+    document.getElementById('joystickKnob');
+
+  const maxRadius = 45;
+
+  function getBaseCenter(){
+
+    const rect =
+      base.getBoundingClientRect();
+
+    return {
+
+      x:rect.left + rect.width / 2,
+      y:rect.top + rect.height / 2
+
+    };
+
+  }
+
+  function handleMove(clientX,clientY){
+
+    const center =
+      getBaseCenter();
+
+    let dx =
+      clientX - center.x;
+
+    let dy =
+      clientY - center.y;
+
+    const dist =
+      Math.hypot(dx,dy);
+
+    if(dist > maxRadius){
+
+      dx =
+        (dx / dist) * maxRadius;
+
+      dy =
+        (dy / dist) * maxRadius;
+
+    }
+
+    knob.style.left =
+      (45 + dx) + 'px';
+
+    knob.style.top =
+      (45 + dy) + 'px';
+
+    joystick.dx =
+      dx / maxRadius;
+
+    joystick.dy =
+      dy / maxRadius;
+
+  }
+
+  function resetKnob(){
+
+    knob.style.left = '45px';
+    knob.style.top = '45px';
+
+    joystick.dx = 0;
+    joystick.dy = 0;
+
+    joystick.active = false;
+    joystick.pointerId = null;
+
+  }
+
+  base.addEventListener('pointerdown',(e)=>{
+
+    joystick.active = true;
+    joystick.pointerId = e.pointerId;
+
+    handleMove(
+      e.clientX,
+      e.clientY
+    );
+
+    e.preventDefault();
+
+  });
+
+  base.addEventListener('pointermove',(e)=>{
+
+    if(
+      !joystick.active ||
+      e.pointerId !== joystick.pointerId
+    ){
+      return;
+    }
+
+    handleMove(
+      e.clientX,
+      e.clientY
+    );
+
+    e.preventDefault();
+
+  });
+
+  window.addEventListener('pointerup',(e)=>{
+
+    if(e.pointerId === joystick.pointerId){
+      resetKnob();
+    }
+
+  });
+
+  window.addEventListener('pointercancel',(e)=>{
+
+    if(e.pointerId === joystick.pointerId){
+      resetKnob();
+    }
+
+  });
+
+}
+
+function setupInteractButton(){
+
+  const btn =
+    document.getElementById('interactBtn');
+
+  btn.addEventListener('pointerdown',(e)=>{
+
+    btn.classList.add('pressed');
+
+    handleInteract();
+
+    e.preventDefault();
+
+  });
+
+  btn.addEventListener('pointerup',()=>{
+
+    btn.classList.remove('pressed');
+
+  });
+
+  btn.addEventListener('pointercancel',()=>{
+
+    btn.classList.remove('pressed');
+
+  });
+
+}
+
+setupJoystick();
+setupInteractButton();
+
+
+/* =========================================================
+   COLLISION
+========================================================= */
+
+function circleHitsWall(x,y,radius){
+
+  const minCol =
+    Math.floor((x - radius) / TILE);
+
+  const maxCol =
+    Math.floor((x + radius) / TILE);
+
+  const minRow =
+    Math.floor((y - radius) / TILE);
+
+  const maxRow =
+    Math.floor((y + radius) / TILE);
+
+  for(let r=minRow;r<=maxRow;r++){
+
+    for(let c=minCol;c<=maxCol;c++){
+
+      if(isWall(c,r)){
+
+        const wx = c * TILE;
+        const wy = r * TILE;
+
+        const closestX =
+          Math.max(
+            wx,
+            Math.min(x,wx + TILE)
+          );
+
+        const closestY =
+          Math.max(
+            wy,
+            Math.min(y,wy + TILE)
+          );
+
+        const dx =
+          x - closestX;
+
+        const dy =
+          y - closestY;
+
+        if(
+          dx * dx +
+          dy * dy <
+          radius * radius
+        ){
+
+          return true;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  return false;
+
+}
+
+function moveWithCollision(entity,dx,dy){
+
+  if(dx !== 0){
+
+    if(
+      !circleHitsWall(
+        entity.x + dx,
+        entity.y,
+        entity.radius
+      )
+    ){
+
+      entity.x += dx;
+
+    }
+
+  }
+
+  if(dy !== 0){
+
+    if(
+      !circleHitsWall(
+        entity.x,
+        entity.y + dy,
+        entity.radius
+      )
+    ){
+
+      entity.y += dy;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   PLAYER MOVEMENT
+========================================================= */
+
+function updatePlayer(dt){
+
+  let mx = 0;
+  let my = 0;
+
+  if(keys['w'] || keys['arrowup']){
+    my -= 1;
+  }
+
+  if(keys['s'] || keys['arrowdown']){
+    my += 1;
+  }
+
+  if(keys['a'] || keys['arrowleft']){
+    mx -= 1;
+  }
+
+  if(keys['d'] || keys['arrowright']){
+    mx += 1;
+  }
+
+  if(
+    joystick.active &&
+    (
+      Math.abs(joystick.dx) > .15 ||
+      Math.abs(joystick.dy) > .15
+    )
+  ){
+
+    mx = joystick.dx;
+    my = joystick.dy;
+
+  }
+
+  if(mx !== 0 || my !== 0){
+
+    const len =
+      Math.hypot(mx,my);
+
+    mx /= len;
+    my /= len;
+
+    player.flashlightAngle =
+      Math.atan2(my,mx);
+
+    moveWithCollision(
+      player,
+      mx * player.speed * dt,
+      my * player.speed * dt
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   COLLECTIBLES
+========================================================= */
+
+const collectibles = [];
+
+function spawnCollectibles(){
+
+  collectibles.length = 0;
+
+  const types = [
+
+    {
+      key:'chicken',
+      emoji:'🍗',
+      label:'Chicken'
+    },
+
+    {
+      key:'sauce',
+      emoji:'🥫',
+      label:'Sauce'
+    },
+
+    {
+      key:'wrap',
+      emoji:'🫓',
+      label:'Wrap'
+    }
+
+  ];
+
+  types.forEach(t=>{
+
+    const spot =
+      randomFloorTile(true);
+
+    collectibles.push({
+
+      key:t.key,
+      emoji:t.emoji,
+      label:t.label,
+
+      x:
+        spot.col * TILE +
+        TILE / 2,
+
+      y:
+        spot.row * TILE +
+        TILE / 2,
+
+      collected:false
+
+    });
+
+  });
+
+}
+
+let nearbyCollectible = null;
+let nearKitchenCraft = false;
+let nearKitchenEat = false;
+
+function updateCollectibleProximity(){
+
+  nearbyCollectible = null;
+
+  for(const c of collectibles){
+
+    if(c.collected){
+      continue;
+    }
+
+    const d =
+      Math.hypot(
+        player.x - c.x,
+        player.y - c.y
+      );
+
+    if(d < 46){
+
+      nearbyCollectible = c;
+      break;
+
+    }
+
+  }
+
+  const pc =
+    Math.floor(player.x / TILE);
+
+  const pr =
+    Math.floor(player.y / TILE);
+
+  const inKitchen =
+    isKitchen(pc,pr);
+
+  nearKitchenCraft = false;
+  nearKitchenEat = false;
+
+  if(inKitchen){
+
+    const allCollected =
+      ingredientsCollected.chicken &&
+      ingredientsCollected.sauce &&
+      ingredientsCollected.wrap;
+
+    if(allCollected && !hasRoll){
+
+      nearKitchenCraft = true;
+
+    }
+
+    if(hasRoll){
+
+      nearKitchenEat = true;
+
+    }
+
+  }
+
+}
+
+function collectedCount(){
+
+  return Object.values(
+    ingredientsCollected
+  ).filter(Boolean).length;
+
+}
+
+
+/* =========================================================
+   CRAFTING
+========================================================= */
+
+function openCraftUI(){
+
+  state = GameState.CRAFTING;
+
+  document
+    .getElementById('craftBox')
+    .classList
+    .remove('hidden');
+
+}
+
+function closeCraftUI(){
+
+  document
+    .getElementById('craftBox')
+    .classList
+    .add('hidden');
+
+  state = GameState.PLAYING;
+
+}
+
+document
+  .getElementById('makeRollBtn')
+  .addEventListener('click',()=>{
+
+    hasRoll = true;
+
+    showToast(
+      '🌯 CHICKEN ROLL CREATED'
+    );
+
+    closeCraftUI();
+
+  });
+
+
+/* =========================================================
+   EATING
+========================================================= */
+
+function openEatUI(){
+
+  state = GameState.EATING;
+
+  eatProgress = 0;
+
+  eatingActive = true;
+
+  document
+    .getElementById('eatBox')
+    .classList
+    .remove('hidden');
+
+  playEatingSound();
+
+}
+
+function updateEating(dt){
+
+  if(!eatingActive){
+    return;
+  }
+
+  eatProgress += dt / 3.2;
+
+  document
+    .getElementById('progressBar')
+    .style
+    .width =
+    Math.min(
+      100,
+      eatProgress * 100
+    ) + '%';
+
+  if(eatProgress >= 1){
+
+    eatingActive = false;
+
+    document
+      .getElementById('eatBox')
+      .classList
+      .add('hidden');
+
+    winGame();
+
+  }
+
+}
+
+function cancelEating(){
+
+  eatingActive = false;
+
+  document
+    .getElementById('eatBox')
+    .classList
+    .add('hidden');
+
+}
+
+
+/* =========================================================
+   INTERACTION
+========================================================= */
+
+function handleInteract(){
+
+  if(state === GameState.PLAYING){
+
+    if(nearbyCollectible){
+
+      nearbyCollectible.collected = true;
+
+      ingredientsCollected[
+        nearbyCollectible.key
+      ] = true;
+
+      showToast(
+        nearbyCollectible.label +
+        ' collected!'
+      );
+
+      nearbyCollectible = null;
+
+      if(collectedCount() === 3){
+
+        setTimeout(()=>{
+
+          showToast(
+            'All ingredients collected. Go to the kitchen.'
+          );
+
+        },600);
+
+      }
+
+      return;
+
+    }
+
+    if(nearKitchenCraft){
+
+      openCraftUI();
+      return;
+
+    }
+
+    if(nearKitchenEat){
+
+      openEatUI();
+      return;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+let toastTimer = null;
+
+function showToast(msg){
+
+  const el =
+    document.getElementById('toast');
+
+  el.textContent = msg;
+
+  el.style.opacity = '1';
+
+  clearTimeout(toastTimer);
+
+  toastTimer =
+    setTimeout(()=>{
+
+      el.style.opacity = '0';
+
+    },2200);
+
+}
+
+function updatePromptBox(){
+
+  const box =
+    document.getElementById('promptBox');
+
+  if(state !== GameState.PLAYING){
+
+    box.classList.add('hidden');
+    return;
+
+  }
+
+  if(nearbyCollectible){
+
+    box.textContent =
+      'Press E to collect ' +
+      nearbyCollectible.label;
+
+    box.classList.remove('hidden');
+
+  }
+  else if(nearKitchenCraft){
+
+    box.textContent =
+      'Press E to make the chicken roll';
+
+    box.classList.remove('hidden');
+
+  }
+  else if(nearKitchenEat){
+
+    box.textContent =
+      'Press E to eat the chicken roll';
+
+    box.classList.remove('hidden');
+
+  }
+  else{
+
+    box.classList.add('hidden');
+
+  }
+
+}
+
+function updateHUD(){
+
+  document
+    .getElementById('hudIngredients')
+    .textContent =
+    'Ingredients: ' +
+    collectedCount() +
+    '/3';
+
+}
+
+
+/* =========================================================
+   HUNTER AI
+========================================================= */
+
+const hunter = {
+
+  x:0,
+  y:0,
+
+  radius:14,
+
+  baseSpeed:70,
+
+  state:'wander',
+
+  wanderTarget:null,
+
+  wanderTimer:0,
+
+  detectRange:340,
+
+  loseRange:480,
+
+  catchRange:20
+
+};
+
+function resetHunter(){
+
+  const spot =
+    randomFloorTile(false);
+
+  hunter.x =
+    spot.col * TILE +
+    TILE / 2;
+
+  hunter.y =
+    spot.row * TILE +
+    TILE / 2;
+
+  hunter.state = 'wander';
+
+  hunter.wanderTarget = null;
+
+  hunter.wanderTimer = 0;
+
+}
+
+function pickWanderTarget(){
+
+  const spot =
+    randomFloorTile(false);
+
+  hunter.wanderTarget = {
+
+    x:
+      spot.col * TILE +
+      TILE / 2,
+
+    y:
+      spot.row * TILE +
+      TILE / 2
+
+  };
+
+}
+
+function updateHunter(dt){
+
+  const dist =
+    Math.hypot(
+      player.x - hunter.x,
+      player.y - hunter.y
+    );
+
+  if(
+    hunter.state === 'wander' &&
+    dist < hunter.detectRange
+  ){
+
+    hunter.state = 'chase';
+
+  }
+  else if(
+    hunter.state === 'chase' &&
+    dist > hunter.loseRange
+  ){
+
+    hunter.state = 'wander';
+
+    hunter.wanderTarget = null;
+
+  }
+
+  let targetX;
+  let targetY;
+  let speed;
+
+  if(hunter.state === 'chase'){
+
+    targetX = player.x;
+    targetY = player.y;
+
+    const closeness =
+      Math.max(
+        0,
+        1 - dist / hunter.detectRange
+      );
+
+    speed =
+      hunter.baseSpeed +
+      closeness * 110;
+
+  }
+  else{
+
+    hunter.wanderTimer -= dt;
+
+    if(
+      !hunter.wanderTarget ||
+      hunter.wanderTimer <= 0
+    ){
+
+      pickWanderTarget();
+
+      hunter.wanderTimer =
+        3 + Math.random() * 3;
+
+    }
+
+    targetX =
+      hunter.wanderTarget.x;
+
+    targetY =
+      hunter.wanderTarget.y;
+
+    speed =
+      hunter.baseSpeed * .7;
+
+  }
+
+  let dx =
+    targetX - hunter.x;
+
+  let dy =
+    targetY - hunter.y;
+
+  const len =
+    Math.hypot(dx,dy);
+
+  if(len > 4){
+
+    dx /= len;
+    dy /= len;
+
+    const prevX = hunter.x;
+    const prevY = hunter.y;
+
+    moveWithCollision(
+      hunter,
+      dx * speed * dt,
+      dy * speed * dt
+    );
+
+    const moved =
+      Math.hypot(
+        hunter.x - prevX,
+        hunter.y - prevY
+      );
+
+    if(
+      moved < .5 &&
+      hunter.state === 'wander'
+    ){
+
+      pickWanderTarget();
+
+    }
+
+  }
+
+  if(
+    dist < hunter.catchRange &&
+    state === GameState.PLAYING
+  ){
+
+    triggerCaught();
+
+  }
+  else if(
+    dist < hunter.catchRange &&
+    state === GameState.EATING
+  ){
+
+    triggerCaught();
+
+  }
+
+  return dist;
+
+}
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+let audioCtx = null;
+
+let masterGain;
+let bassGain;
+let drumGain;
+let droneGain;
+let heartGain;
+
+let audioStarted = false;
+let audioLoopHandle = null;
+
+let currentProximity = 1.0;
+
+function initAudio(){
+
+  if(audioStarted){
+    return;
+  }
+
+  audioStarted = true;
+
+  audioCtx =
+    new (
+      window.AudioContext ||
+      window.webkitAudioContext
+    )();
+
+  masterGain =
+    audioCtx.createGain();
+
+  masterGain.gain.value = .5;
+
+  masterGain.connect(
+    audioCtx.destination
+  );
+
+  bassGain =
+    audioCtx.createGain();
+
+  bassGain.gain.value = 0;
+
+  bassGain.connect(masterGain);
+
+  drumGain =
+    audioCtx.createGain();
+
+  drumGain.gain.value = 0;
+
+  drumGain.connect(masterGain);
+
+  droneGain =
+    audioCtx.createGain();
+
+  droneGain.gain.value = .08;
+
+  droneGain.connect(masterGain);
+
+  heartGain =
+    audioCtx.createGain();
+
+  heartGain.gain.value = 0;
+
+  heartGain.connect(masterGain);
+
+  startDrone();
+  scheduleLoop();
+
+}
+
+function startDrone(){
+
+  const osc =
+    audioCtx.createOscillator();
+
+  osc.type = 'sine';
+  osc.frequency.value = 55;
+
+  const lfo =
+    audioCtx.createOscillator();
+
+  lfo.type = 'sine';
+  lfo.frequency.value = .07;
+
+  const lfoGain =
+    audioCtx.createGain();
+
+  lfoGain.gain.value = 6;
+
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+
+  osc.connect(droneGain);
+
+  osc.start();
+  lfo.start();
+
+}
+
+function playBassPulse(intensity){
+
+  const osc =
+    audioCtx.createOscillator();
+
+  osc.type = 'sawtooth';
+
+  osc.frequency.setValueAtTime(
+    48,
+    audioCtx.currentTime
+  );
+
+  osc.frequency.exponentialRampToValueAtTime(
+    30,
+    audioCtx.currentTime + .25
+  );
+
+  const g =
+    audioCtx.createGain();
+
+  g.gain.setValueAtTime(
+    .0001,
+    audioCtx.currentTime
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .5 * intensity,
+    audioCtx.currentTime + .02
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .0001,
+    audioCtx.currentTime + .3
+  );
+
+  osc.connect(g);
+  g.connect(bassGain);
+
+  osc.start();
+
+  osc.stop(
+    audioCtx.currentTime + .32
+  );
+
+}
+
+function playDrumHit(type){
+
+  const bufferSize =
+    audioCtx.sampleRate * .1;
+
+  const buffer =
+    audioCtx.createBuffer(
+      1,
+      bufferSize,
+      audioCtx.sampleRate
+    );
+
+  const data =
+    buffer.getChannelData(0);
+
+  for(
+    let i=0;
+    i<bufferSize;
+    i++
+  ){
+
+    data[i] =
+      (Math.random() * 2 - 1) *
+      Math.pow(
+        1 - i / bufferSize,
+        2
+      );
+
+  }
+
+  const noise =
+    audioCtx.createBufferSource();
+
+  noise.buffer = buffer;
+
+  const filter =
+    audioCtx.createBiquadFilter();
+
+  filter.type =
+    type === 'hat'
+      ? 'highpass'
+      : 'lowpass';
+
+  filter.frequency.value =
+    type === 'hat'
+      ? 6000
+      : 900;
+
+  const g =
+    audioCtx.createGain();
+
+  g.gain.setValueAtTime(
+    type === 'hat' ? .15 : .35,
+    audioCtx.currentTime
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .001,
+    audioCtx.currentTime +
+    (type === 'hat' ? .05 : .15)
+  );
+
+  noise.connect(filter);
+  filter.connect(g);
+  g.connect(drumGain);
+
+  noise.start();
+
+}
+
+function playSynthStab(){
+
+  const osc =
+    audioCtx.createOscillator();
+
+  osc.type = 'square';
+
+  const baseFreq =
+    110 + Math.random() * 40;
+
+  osc.frequency.setValueAtTime(
+    baseFreq,
+    audioCtx.currentTime
+  );
+
+  osc.frequency.exponentialRampToValueAtTime(
+    baseFreq * .6,
+    audioCtx.currentTime + .15
+  );
+
+  const shaper =
+    audioCtx.createWaveShaper();
+
+  const curve =
+    new Float32Array(256);
+
+  for(let i=0;i<256;i++){
+
+    const x =
+      i / 128 - 1;
+
+    curve[i] =
+      Math.tanh(x * 4);
+
+  }
+
+  shaper.curve = curve;
+
+  const g =
+    audioCtx.createGain();
+
+  g.gain.setValueAtTime(
+    .001,
+    audioCtx.currentTime
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .25,
+    audioCtx.currentTime + .02
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .001,
+    audioCtx.currentTime + .4
+  );
+
+  osc.connect(shaper);
+  shaper.connect(g);
+  g.connect(drumGain);
+
+  osc.start();
+
+  osc.stop(
+    audioCtx.currentTime + .42
+  );
+
+}
+
+function playEerieTone(){
+
+  const osc =
+    audioCtx.createOscillator();
+
+  osc.type = 'sine';
+
+  osc.frequency.value =
+    800 + Math.random() * 600;
+
+  const g =
+    audioCtx.createGain();
+
+  g.gain.setValueAtTime(
+    .0001,
+    audioCtx.currentTime
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .06,
+    audioCtx.currentTime + 1.2
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .0001,
+    audioCtx.currentTime + 3.5
+  );
+
+  osc.connect(g);
+  g.connect(droneGain);
+
+  osc.start();
+
+  osc.stop(
+    audioCtx.currentTime + 3.6
+  );
+
+}
+
+function playHeartbeat(){
+
+  playDrumHit('kick');
+
+  setTimeout(()=>{
+
+    if(audioCtx){
+      playDrumHit('kick');
+    }
+
+  },160);
+
+}
+
+function playEatingSound(){
+
+  if(!audioCtx){
+    return;
+  }
+
+  const osc =
+    audioCtx.createOscillator();
+
+  osc.type = 'triangle';
+
+  osc.frequency.value = 300;
+
+  const g =
+    audioCtx.createGain();
+
+  g.gain.setValueAtTime(
+    .15,
+    audioCtx.currentTime
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .001,
+    audioCtx.currentTime + .6
+  );
+
+  osc.connect(g);
+  g.connect(masterGain);
+
+  osc.start();
+
+  osc.stop(
+    audioCtx.currentTime + .6
+  );
+
+}
+
+function playJumpscareSound(){
+
+  if(!audioCtx){
+    return;
+  }
+
+  const osc =
+    audioCtx.createOscillator();
+
+  osc.type = 'sawtooth';
+
+  osc.frequency.setValueAtTime(
+    90,
+    audioCtx.currentTime
+  );
+
+  osc.frequency.exponentialRampToValueAtTime(
+    700,
+    audioCtx.currentTime + .15
+  );
+
+  osc.frequency.exponentialRampToValueAtTime(
+    60,
+    audioCtx.currentTime + .5
+  );
+
+  const g =
+    audioCtx.createGain();
+
+  g.gain.setValueAtTime(
+    .6,
+    audioCtx.currentTime
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+    .001,
+    audioCtx.currentTime + .9
+  );
+
+  osc.connect(g);
+  g.connect(masterGain);
+
+  osc.start();
+
+  osc.stop(
+    audioCtx.currentTime + .9
+  );
+
+}
+
+function playVictorySound(){
+
+  if(!audioCtx){
+    return;
+  }
+
+  [
+    523,
+    659,
+    784,
+    1046
+  ].forEach((f,i)=>{
+
+    const osc =
+      audioCtx.createOscillator();
+
+    osc.type = 'triangle';
+    osc.frequency.value = f;
+
+    const g =
+      audioCtx.createGain();
+
+    const t0 =
+      audioCtx.currentTime +
+      i * .12;
+
+    g.gain.setValueAtTime(
+      .0001,
+      t0
+    );
+
+    g.gain.exponentialRampToValueAtTime(
+      .2,
+      t0 + .03
+    );
+
+    g.gain.exponentialRampToValueAtTime(
+      .0001,
+      t0 + .5
+    );
+
+    osc.connect(g);
+    g.connect(masterGain);
+
+    osc.start(t0);
+
+    osc.stop(t0 + .55);
+
+  });
+
+}
+
+let beatCounter = 0;
+
+function scheduleLoop(){
+
+  const intensity =
+    1 - currentProximity;
+
+  const targetBass =
+    .15 + intensity * .6;
+
+  const targetDrum =
+    .1 + intensity * .6;
+
+  bassGain.gain.linearRampToValueAtTime(
+    targetBass,
+    audioCtx.currentTime + .3
+  );
+
+  drumGain.gain.linearRampToValueAtTime(
+    targetDrum,
+    audioCtx.currentTime + .3
+  );
+
+  const interval =
+    620 - intensity * 380;
+
+  if(currentProximity < .8){
+
+    playBassPulse(
+      .3 + intensity * .8
+    );
+
+  }
+
+  if(currentProximity < .55){
+
+    if(beatCounter % 2 === 0){
+      playDrumHit('hat');
+    }
+
+    if(beatCounter % 4 === 0){
+      playDrumHit('kick');
+    }
+
+  }
+
+  if(currentProximity < .3){
+
+    playSynthStab();
+
+  }
+
+  if(currentProximity < .2){
+
+    playHeartbeat();
+
+  }
+
+  if(
+    Math.random() <
+    .01 +
+    (
+      currentProximity < .5
+        ? .02
+        : 0
+    )
+  ){
+
+    playEerieTone();
+
+  }
+
+  beatCounter++;
+
+  audioLoopHandle =
+    setTimeout(
+      scheduleLoop,
+      interval
+    );
+
+}
+
+function stopAudioLoop(){
+
+  if(audioLoopHandle){
+
+    clearTimeout(
+      audioLoopHandle
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PROXIMITY EFFECTS
+========================================================= */
+
+let shakeAmount = 0;
+
+function updateProximityEffects(dist){
+
+  const FAR = 700;
+  const CLOSE = 150;
+
+  let danger =
+    1 -
+    Math.min(
+      1,
+      Math.max(
+        0,
+        (dist - CLOSE) /
+        (FAR - CLOSE)
+      )
+    );
+
+  currentProximity =
+    1 - danger;
+
+  const vignette =
+    document.getElementById(
+      'vignette'
+    );
+
+  const spread =
+    danger * 260;
+
+  const opacity =
+    danger * .9;
+
+  vignette.style.boxShadow =
+    `inset 0 0 ${100 + spread}px ` +
+    `${40 + spread * .4}px ` +
+    `rgba(200,0,0,${opacity})`;
+
+  shakeAmount =
+    danger > .85
+      ? (danger - .85) * 40
+      : 0;
+
+}
+
+
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+let caughtTriggered = false;
+
+function triggerCaught(){
+
+  if(caughtTriggered){
+    return;
+  }
+
+  caughtTriggered = true;
+
+  state =
+    GameState.GAMEOVER;
+
+  cancelEating();
+
+  playJumpscareSound();
+
+  const flash =
+    document.getElementById(
+      'flashOverlay'
+    );
+
+  flash.style.transition = 'none';
+
+  flash.style.opacity = '1';
+
+  setTimeout(()=>{
+
+    flash.style.transition =
+      'opacity .6s';
+
+    flash.style.opacity = '0';
+
+  },90);
+
+  shakeAmount = 30;
+
+  setTimeout(()=>{
+
+    document
+      .getElementById(
+        'gameOverScreen'
+      )
+      .classList
+      .remove('hidden');
+
+    document
+      .getElementById('hud')
+      .classList
+      .add('hidden');
+
+  },500);
+
+}
+
+
+/* =========================================================
+   WIN
+========================================================= */
+
+function winGame(){
+
+  state =
+    GameState.WIN;
+
+  playVictorySound();
+
+  document
+    .getElementById('winScreen')
+    .classList
+    .remove('hidden');
+
+  document
+    .getElementById('hud')
+    .classList
+    .add('hidden');
+
+}
+
+
+/* =========================================================
+   RENDERING
+========================================================= */
+
+function drawMap(camX,camY){
+
+  const startCol =
+    Math.floor(camX / TILE) - 1;
+
+  const endCol =
+    Math.floor(
+      (camX + canvas.width) /
+      TILE
+    ) + 1;
+
+  const startRow =
+    Math.floor(camY / TILE) - 1;
+
+  const endRow =
+    Math.floor(
+      (camY + canvas.height) /
+      TILE
+    ) + 1;
+
+  for(
+    let r=startRow;
+    r<=endRow;
+    r++
+  ){
+
+    for(
+      let c=startCol;
+      c<=endCol;
+      c++
+    ){
+
+      const t =
+        tileAt(c,r);
+
+      const x =
+        c * TILE - camX;
+
+      const y =
+        r * TILE - camY;
+
+      if(t === '1'){
+
+        ctx.fillStyle =
+          '#1b1b1f';
+
+        ctx.fillRect(
+          x,
+          y,
+          TILE,
+          TILE
+        );
+
+        ctx.strokeStyle =
+          '#0a0a0c';
+
+        ctx.strokeRect(
+          x,
+          y,
+          TILE,
+          TILE
+        );
+
+      }
+      else if(t === 'K'){
+
+        ctx.fillStyle =
+          '#181410';
+
+        ctx.fillRect(
+          x,
+          y,
+          TILE,
+          TILE
+        );
+
+      }
+      else{
+
+        ctx.fillStyle =
+          '#0c0c0e';
+
+        ctx.fillRect(
+          x,
+          y,
+          TILE,
+          TILE
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+function drawKitchenLabel(camX,camY){
+
+  ctx.fillStyle =
+    'rgba(255,150,60,.85)';
+
+  ctx.font =
+    '14px Courier New';
+
+  ctx.textAlign =
+    'center';
+
+  ctx.fillText(
+    'KITCHEN',
+    8 * TILE - camX,
+    21 * TILE - camY
+  );
+
+}
+
+function drawCollectibles(camX,camY){
+
+  collectibles.forEach(c=>{
+
+    if(c.collected){
+      return;
+    }
+
+    const x =
+      c.x - camX;
+
+    const y =
+      c.y - camY;
+
+    if(
+      x < -50 ||
+      x > canvas.width + 50 ||
+      y < -50 ||
+      y > canvas.height + 50
+    ){
+
+      return;
+
+    }
+
+    ctx.font =
+      '26px serif';
+
+    ctx.textAlign =
+      'center';
+
+    ctx.textBaseline =
+      'middle';
+
+    const bob =
+      Math.sin(
+        Date.now() / 300 +
+        c.x
+      ) * 4;
+
+    ctx.fillText(
+      c.emoji,
+      x,
+      y + bob
+    );
+
+  });
+
+}
+
+function drawPlayer(camX,camY){
+
+  const x =
+    player.x - camX;
+
+  const y =
+    player.y - camY;
+
+  ctx.fillStyle =
+    '#d8d8d8';
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,
+    y,
+    player.radius,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.strokeStyle =
+    '#333';
+
+  ctx.stroke();
+
+}
+
+function drawHunter(camX,camY,danger){
+
+  const x =
+    hunter.x - camX;
+
+  const y =
+    hunter.y - camY;
+
+  if(
+    x < -80 ||
+    x > canvas.width + 80 ||
+    y < -80 ||
+    y > canvas.height + 80
+  ){
+
+    return;
+
+  }
+
+  ctx.save();
+
+  ctx.translate(x,y);
+
+  ctx.fillStyle =
+    '#0a0a0a';
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    0,
+    6,
+    16,
+    24,
+    0,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    0,
+    -18,
+    12,
+    14,
+    0,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  const eyeAlpha =
+    .5 + danger * .5;
+
+  ctx.fillStyle =
+    `rgba(255,40,40,${eyeAlpha})`;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -4,
+    -18,
+    2.2,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    4,
+    -18,
+    2.2,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  if(danger > .5){
+
+    ctx.shadowColor =
+      'red';
+
+    ctx.shadowBlur =
+      12 * danger;
+
+    ctx.fillStyle =
+      `rgba(255,0,0,${danger * .4})`;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      -18,
+      20,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+  }
+
+  ctx.restore();
+
+}
+
+function drawLighting(camX,camY){
+
+  const px =
+    player.x - camX;
+
+  const py =
+    player.y - camY;
+
+  ctx.fillStyle =
+    '#000';
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  ctx.save();
+
+  ctx.globalCompositeOperation =
+    'destination-out';
+
+  const holeGrad =
+    ctx.createRadialGradient(
+      px,
+      py,
+      10,
+      px,
+      py,
+      280
+    );
+
+  holeGrad.addColorStop(
+    0,
+    'rgba(255,255,255,1)'
+  );
+
+  holeGrad.addColorStop(
+    .6,
+    'rgba(255,255,255,.5)'
+  );
+
+  holeGrad.addColorStop(
+    1,
+    'rgba(255,255,255,0)'
+  );
+
+  ctx.fillStyle =
+    holeGrad;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    px,
+    py,
+    280,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.restore();
+
+}
+
+function render(dist){
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  let camX =
+    player.x -
+    canvas.width / 2;
+
+  let camY =
+    player.y -
+    canvas.height / 2;
+
+  if(shakeAmount > 0){
+
+    camX +=
+      (Math.random() - .5) *
+      shakeAmount;
+
+    camY +=
+      (Math.random() - .5) *
+      shakeAmount;
+
+  }
+
+  ctx.fillStyle =
+    '#000';
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  drawMap(camX,camY);
+
+  drawKitchenLabel(
+    camX,
+    camY
+  );
+
+  drawCollectibles(
+    camX,
+    camY
+  );
+
+  const danger =
+    dist !== undefined
+      ? Math.max(
+          0,
+          1 -
+          Math.min(
+            1,
+            (dist - 150) / 550
+          )
+        )
+      : 0;
+
+  drawHunter(
+    camX,
+    camY,
+    danger
+  );
+
+  drawPlayer(
+    camX,
+    camY
+  );
+
+  drawLighting(
+    camX,
+    camY
+  );
+
+}
+
+
+/* =========================================================
+   MAIN LOOP
+========================================================= */
+
+let lastTime =
+  performance.now();
+
+function gameLoop(now){
+
+  const dt =
+    Math.min(
+      .05,
+      (now - lastTime) / 1000
+    );
+
+  lastTime = now;
+
+  let dist;
+
+  if(
+    (
+      state === GameState.PLAYING ||
+      state === GameState.EATING
+    ) &&
+    !paused
+  ){
+
+    if(state === GameState.PLAYING){
+
+      updatePlayer(dt);
+
+      updateCollectibleProximity();
+
+      updatePromptBox();
+
+      updateHUD();
+
+    }
+
+    if(state === GameState.EATING){
+
+      updateEating(dt);
+
+    }
+
+    dist =
+      updateHunter(dt);
+
+    updateProximityEffects(dist);
+
+    if(shakeAmount > 0){
+
+      shakeAmount *= .9;
+
+    }
+
+  }
+  else if(
+    state === GameState.CRAFTING
+  ){
+
+    dist =
+      updateHunter(dt);
+
+    updateProximityEffects(dist);
+
+  }
+
+  if(
+    state === GameState.PLAYING ||
+    state === GameState.EATING ||
+    state === GameState.CRAFTING
+  ){
+
+    render(dist);
+
+  }
+
+  requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================================================
+   START / RESTART
+========================================================= */
+
+function startGame(){
+
+  document
+    .getElementById('startScreen')
+    .classList
+    .add('hidden');
+
+  document
+    .getElementById('hud')
+    .classList
+    .remove('hidden');
+
+  ingredientsCollected = {
+
+    chicken:false,
+    sauce:false,
+    wrap:false
+
+  };
+
+  hasRoll = false;
+
+  caughtTriggered = false;
+
+  paused = false;
+
+  resetPlayer();
+
+  resetHunter();
+
+  spawnCollectibles();
+
+  updateHUD();
+
+  state =
+    GameState.PLAYING;
+
+  initAudio();
+
+}
+
+document
+  .getElementById('startBtn')
+  .addEventListener(
+    'click',
+    startGame
+  );
+
+document
+  .getElementById('retryBtn')
+  .addEventListener(
+    'click',
+    ()=>{
+
+      document
+        .getElementById(
+          'gameOverScreen'
+        )
+        .classList
+        .add('hidden');
+
+      startGame();
+
+    }
+  );
+
+document
+  .getElementById('playAgainBtn')
+  .addEventListener(
+    'click',
+    ()=>{
+
+      document
+        .getElementById(
+          'winScreen'
+        )
+        .classList
+        .add('hidden');
+
+      startGame();
+
+    }
+  );
+
+
+/* =========================================================
+   START GAME LOOP
+========================================================= */
+
+requestAnimationFrame(gameLoop);
+
+</script>
+
+</body>
+</html>
