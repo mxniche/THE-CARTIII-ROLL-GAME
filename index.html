@@ -1,110 +1,31 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>THE HUNTER</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nightfall Diner V2</title>
 
 <style>
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 html, body {
+    margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #000;
-    font-family: monospace;
+    background: #080b12;
+    font-family: Arial, sans-serif;
     color: white;
-    touch-action: none;
-}
-
-canvas {
-    display: block;
-}
-
-#menu {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background:
-        radial-gradient(circle at center, rgba(35,35,35,.2), #000 70%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-#menu h1 {
-    font-size: clamp(45px, 10vw, 90px);
-    color: #d00000;
-    letter-spacing: 12px;
-    text-shadow: 0 0 25px red;
-}
-
-#menu h2 {
-    margin-top: 8px;
-    color: #777;
-    letter-spacing: 5px;
-    font-size: 16px;
-}
-
-#menu p {
-    margin-top: 25px;
-    max-width: 600px;
-    padding: 20px;
-    color: #aaa;
-    line-height: 1.7;
-}
-
-#start {
-    margin-top: 15px;
-    padding: 15px 35px;
-    background: #150000;
-    color: #ff3333;
-    border: 2px solid #ff3333;
-    font-family: monospace;
-    font-size: 18px;
-    letter-spacing: 3px;
-}
-
-#start:active {
-    background: #ff3333;
-    color: black;
-}
-
-.hidden {
-    display: none !important;
 }
 
 #hud {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 20;
-}
-
-#stats {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    font-size: 15px;
-    line-height: 1.7;
-    text-shadow: 0 2px 5px black;
-}
-
-#objective {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    max-width: 270px;
-    text-align: right;
-    color: #ccc;
-    line-height: 1.5;
+    z-index: 10;
 }
 
 #crosshair {
@@ -113,418 +34,331 @@ canvas {
     top: 50%;
     width: 5px;
     height: 5px;
+    margin-left: -2.5px;
+    margin-top: -2.5px;
     background: white;
     border-radius: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 5px white;
 }
 
-#message {
+#batteryBox {
     position: absolute;
-    bottom: 20%;
+    right: 20px;
+    top: 20px;
+    width: 200px;
+    padding: 10px;
+    background: rgba(0,0,0,.6);
+    border-radius: 8px;
+}
+
+#batteryBar {
+    height: 8px;
+    margin-top: 6px;
+    background: #333;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#batteryFill {
+    height: 100%;
+    width: 100%;
+    background: #dcecff;
+}
+
+#inventory {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    padding: 10px 13px;
+    background: rgba(0,0,0,.55);
+    border-radius: 8px;
+}
+
+#objective {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    max-width: 380px;
+    padding: 12px;
+    background: rgba(0,0,0,.55);
+    border-radius: 8px;
+}
+
+#prompt {
+    position: absolute;
     left: 50%;
+    bottom: 15%;
     transform: translateX(-50%);
-    color: #ffb0b0;
-    font-size: 17px;
-    text-align: center;
-    text-shadow: 0 2px 5px black;
-}
-
-#damage {
-    position: fixed;
-    inset: 0;
-    background: rgba(180,0,0,.35);
-    pointer-events: none;
-    z-index: 50;
-    opacity: 0;
-}
-
-#danger {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 15;
-    box-shadow: inset 0 0 150px rgba(120,0,0,0);
-    transition: box-shadow .2s;
-}
-
-#endScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(0,0,0,.94);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-}
-
-#endScreen h1 {
-    font-size: 60px;
-    color: #d00000;
-    letter-spacing: 8px;
-}
-
-#endScreen p {
-    color: #aaa;
-    margin: 20px;
-}
-
-#restart {
-    padding: 13px 30px;
-    background: #170000;
-    color: #ff3333;
-    border: 2px solid #ff3333;
-    font-family: monospace;
-    font-size: 17px;
-}
-
-/* MOBILE */
-
-#mobileControls {
     display: none;
+    padding: 10px 16px;
+    background: rgba(0,0,0,.8);
+    border-radius: 7px;
+}
+
+#startScreen {
     position: fixed;
     inset: 0;
-    z-index: 30;
-    pointer-events: none;
-}
-
-#joystick {
-    position: absolute;
-    bottom: 35px;
-    left: 30px;
-    width: 125px;
-    height: 125px;
-    border: 2px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    background: rgba(255,255,255,.06);
-    pointer-events: auto;
-}
-
-#stick {
-    position: absolute;
-    width: 45px;
-    height: 45px;
-    left: 38px;
-    top: 38px;
-    border-radius: 50%;
-    background: rgba(255,70,70,.55);
-}
-
-.mobileBtn {
-    position: absolute;
-    width: 75px;
-    height: 75px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,70,70,.7);
-    background: rgba(80,0,0,.3);
-    color: white;
+    z-index: 20;
     display: flex;
     justify-content: center;
     align-items: center;
-    pointer-events: auto;
-    font-family: monospace;
+    text-align: center;
+    background: radial-gradient(circle, #1b2a3c, #030507 75%);
 }
 
-#sprint {
-    right: 35px;
-    bottom: 130px;
+#startBox {
+    max-width: 650px;
+    padding: 30px;
 }
 
-#interact {
-    right: 35px;
-    bottom: 35px;
+button {
+    padding: 14px 25px;
+    border: 0;
+    border-radius: 7px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-#lookArea {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 55%;
-    height: 75%;
-    pointer-events: auto;
-}
-
-@media (pointer: coarse) {
-    #mobileControls {
-        display: block;
-    }
+.small {
+    opacity: .7;
+    font-size: 13px;
+    line-height: 1.6;
 }
 </style>
 </head>
 
 <body>
 
-<div id="menu">
-    <h1>THE HUNTER</h1>
-    <h2>FOREST DINER</h2>
-    <p>
-        You are stranded in a forest.<br>
-        Your only safe place is an abandoned diner.<br><br>
-        Find the ingredients. Bring them back.<br>
-        Cook the meal. Stay alive.
-        <br><br>
-        Something else lives in these woods.
-    </p>
-    <button id="start">ENTER THE FOREST</button>
+<div id="startScreen">
+    <div id="startBox">
+        <h1>NIGHTFALL DINER</h1>
+        <p>Something is watching from the forest.</p>
+
+        <p class="small">
+            WASD = Move<br>
+            Mouse = Look<br>
+            E = Collect / Interact<br>
+            F = Flashlight
+        </p>
+
+        <button id="startButton">ENTER THE FOREST</button>
+    </div>
 </div>
 
 <div id="hud">
 
-    <div id="stats">
-        ❤️ HEALTH: <span id="health">100</span><br>
-        🔦 BATTERY: <span id="battery">100</span>%<br>
-        🍗 CHICKEN: <span id="chicken">0</span>/1<br>
-        🥫 SAUCE: <span id="sauce">0</span>/1<br>
-        🫓 WRAP: <span id="wrap">0</span>/1
+    <div id="inventory">
+        Items collected: <span id="items">0</span>
     </div>
 
-    <div id="objective">
-        OBJECTIVE:<br>
-        Find the ingredients.
+    <div id="batteryBox">
+        Flashlight: <span id="batteryText">100%</span>
+
+        <div id="batteryBar">
+            <div id="batteryFill"></div>
+        </div>
     </div>
 
     <div id="crosshair"></div>
-    <div id="message"></div>
 
-</div>
+    <div id="prompt"></div>
 
-<div id="danger"></div>
-<div id="damage"></div>
-
-<div id="mobileControls">
-    <div id="joystick">
-        <div id="stick"></div>
+    <div id="objective">
+        Objective: Explore the forest and investigate the diner.
     </div>
 
-    <div id="lookArea"></div>
-
-    <div id="sprint" class="mobileBtn">RUN</div>
-    <div id="interact" class="mobileBtn">USE</div>
 </div>
 
-<div id="endScreen" class="hidden">
-    <h1 id="endTitle">CAUGHT</h1>
-    <p id="endText">The forest wins.</p>
-    <button id="restart">TRY AGAIN</button>
-</div>
+<script type="module">
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js";
 
-<script>
+import { PointerLockControls } from
+"https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/controls/PointerLockControls.js";
+
 
 /* =========================================================
-   THE HUNTER: FOREST DINER
-   BUILD 1
+   BASIC SETUP
 ========================================================= */
 
-let scene;
-let camera;
-let renderer;
-let clock;
+const scene = new THREE.Scene();
 
-let player;
-let hunter;
+scene.background = new THREE.Color(0x111a29);
 
-let flashlight;
-let flashlightTarget;
+scene.fog = new THREE.FogExp2(
+    0x111a29,
+    0.017
+);
 
-let gameStarted = false;
-let gameOver = false;
 
-let health = 100;
+const camera = new THREE.PerspectiveCamera(
+    72,
+    innerWidth / innerHeight,
+    0.05,
+    500
+);
+
+camera.position.set(0, 1.7, 30);
+
+
+const renderer = new THREE.WebGLRenderer({
+    antialias: true
+});
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(devicePixelRatio, 2)
+);
+
+renderer.shadowMap.enabled = true;
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+document.body.appendChild(
+    renderer.domElement
+);
+
+
+const controls =
+    new PointerLockControls(
+        camera,
+        document.body
+    );
+
+scene.add(camera);
+
+
+const clock = new THREE.Clock();
+
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+const keys = {};
+
+let flashlightOn = true;
+
 let battery = 100;
 
-let ingredients = {
-    chicken: false,
-    sauce: false,
-    wrap: false
-};
+let collectedItems = 0;
 
-let batteries = [];
-let healthPacks = [];
-let ingredientObjects = [];
-
-let hunterSpeed = 2.0;
-
-let keys = {};
-
-let yaw = 0;
-let pitch = 0;
-
-let velocity = new THREE.Vector3();
-
-let audioContext = null;
-let ambienceGain = null;
-
-let messageTimer = 0;
+let interactables = [];
 
 
 /* =========================================================
-   BASIC UI
+   KEYBOARD
 ========================================================= */
 
-const menu = document.getElementById("menu");
-const healthUI = document.getElementById("health");
-const batteryUI = document.getElementById("battery");
+document.addEventListener("keydown", event => {
 
-const chickenUI = document.getElementById("chicken");
-const sauceUI = document.getElementById("sauce");
-const wrapUI = document.getElementById("wrap");
+    keys[event.code] = true;
 
-const objectiveUI = document.getElementById("objective");
-const messageUI = document.getElementById("message");
+    if (event.code === "KeyF") {
+        flashlightOn = !flashlightOn;
+    }
 
-const damageUI = document.getElementById("damage");
-const dangerUI = document.getElementById("danger");
+    if (event.code === "KeyE") {
+        interact();
+    }
 
-const endScreen = document.getElementById("endScreen");
-const endTitle = document.getElementById("endTitle");
-const endText = document.getElementById("endText");
-
-
-/* =========================================================
-   START
-========================================================= */
-
-document.getElementById("start").addEventListener("click", startGame);
-
-document.getElementById("restart").addEventListener("click", () => {
-    location.reload();
 });
 
 
-function startGame() {
+document.addEventListener("keyup", event => {
 
-    menu.classList.add("hidden");
+    keys[event.code] = false;
 
-    gameStarted = true;
-
-    initAudio();
-    initGame();
-
-}
+});
 
 
 /* =========================================================
-   AUDIO
+   MATERIAL HELPERS
 ========================================================= */
 
-function initAudio() {
+function material(color, roughness = 1) {
 
-    try {
-
-        audioContext =
-            new (window.AudioContext || window.webkitAudioContext)();
-
-        ambienceGain = audioContext.createGain();
-
-        ambienceGain.gain.value = 0.035;
-
-        ambienceGain.connect(audioContext.destination);
-
-        const osc = audioContext.createOscillator();
-
-        osc.type = "sine";
-        osc.frequency.value = 43;
-
-        osc.connect(ambienceGain);
-
-        osc.start();
-
-    } catch(e) {}
-
-}
-
-
-function playSound(freq, duration, volume, type="sine") {
-
-    if (!audioContext) return;
-
-    const osc = audioContext.createOscillator();
-
-    const gain = audioContext.createGain();
-
-    osc.type = type;
-    osc.frequency.value = freq;
-
-    gain.gain.setValueAtTime(volume, audioContext.currentTime);
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.001,
-        audioContext.currentTime + duration
-    );
-
-    osc.connect(gain);
-    gain.connect(audioContext.destination);
-
-    osc.start();
-    osc.stop(audioContext.currentTime + duration);
-
-}
-
-
-/* =========================================================
-   THREE.JS INIT
-========================================================= */
-
-function initGame() {
-
-    scene = new THREE.Scene();
-
-    scene.background = new THREE.Color(0x020303);
-
-    scene.fog = new THREE.FogExp2(
-        0x020303,
-        0.018
-    );
-
-
-    camera = new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-    );
-
-
-    renderer = new THREE.WebGLRenderer({
-        antialias: true
+    return new THREE.MeshStandardMaterial({
+        color: color,
+        roughness: roughness
     });
 
-    renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, 2)
+}
+
+
+function box(
+    width,
+    height,
+    depth,
+    mat,
+    x,
+    y,
+    z
+) {
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            mat
+        );
+
+    mesh.position.set(
+        x,
+        y,
+        z
     );
 
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    scene.add(mesh);
+
+    return mesh;
+
+}
+
+
+function cylinder(
+    radius,
+    height,
+    mat,
+    x,
+    y,
+    z
+) {
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                radius,
+                radius * .88,
+                height,
+                10
+            ),
+            mat
+        );
+
+    mesh.position.set(
+        x,
+        y,
+        z
     );
 
-    document.body.appendChild(renderer.domElement);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
 
+    scene.add(mesh);
 
-    clock = new THREE.Clock();
-
-
-    setupLighting();
-    createGround();
-    createForest();
-    createDiner();
-
-    createPlayer();
-    createHunter();
-
-    spawnIngredients();
-    spawnBatteries();
-    spawnHealthPacks();
-
-    setupInput();
-
-    window.addEventListener("resize", onResize);
-
-    animate();
+    return mesh;
 
 }
 
@@ -533,32 +367,100 @@ function initGame() {
    LIGHTING
 ========================================================= */
 
-function setupLighting() {
-
-    const ambient = new THREE.AmbientLight(
-        0x334455,
-        0.08
+const ambient =
+    new THREE.HemisphereLight(
+        0x9dbdff,
+        0x17110b,
+        1.25
     );
 
-    scene.add(ambient);
+scene.add(ambient);
 
 
-    flashlight = new THREE.SpotLight(
-        0xffffff,
-        8,
-        28,
+const moon =
+    new THREE.DirectionalLight(
+        0xbad4ff,
+        2.1
+    );
+
+moon.position.set(
+    -80,
+    100,
+    40
+);
+
+moon.castShadow = true;
+
+moon.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(moon);
+
+
+/* =========================================================
+   FLASHLIGHT
+========================================================= */
+
+const flashlight =
+    new THREE.SpotLight(
+        0xeaf4ff,
+        90,
+        44,
         Math.PI / 7,
-        0.7,
-        1
+        0.55,
+        1.4
     );
 
-    scene.add(flashlight);
+flashlight.castShadow = true;
 
-    flashlightTarget = new THREE.Object3D();
+flashlight.shadow.mapSize.set(
+    1024,
+    1024
+);
 
-    scene.add(flashlightTarget);
+scene.add(flashlight);
 
-    flashlight.target = flashlightTarget;
+scene.add(
+    flashlight.target
+);
+
+
+function updateFlashlight() {
+
+    /*
+       The flashlight is attached to the camera.
+
+       Therefore:
+       Look left  -> flashlight left
+       Look right -> flashlight right
+       Look up    -> flashlight up
+       Look down  -> flashlight down
+    */
+
+    const direction =
+        new THREE.Vector3(
+            0,
+            0,
+            -1
+        ).applyQuaternion(
+            camera.quaternion
+        );
+
+    flashlight.position.copy(
+        camera.position
+    );
+
+    flashlight.target.position.copy(
+        camera.position
+    ).add(
+        direction.multiplyScalar(20)
+    );
+
+    flashlight.visible =
+        flashlightOn &&
+        battery > 0;
 
 }
 
@@ -567,115 +469,234 @@ function setupLighting() {
    GROUND
 ========================================================= */
 
-function createGround() {
+const grassMaterial =
+    material(0x263720);
 
-    const geometry =
-        new THREE.PlaneGeometry(200, 200);
+const dirtMaterial =
+    material(0x4b3929);
 
-    const material =
-        new THREE.MeshStandardMaterial({
-            color: 0x11150f,
-            roughness: 1
-        });
 
-    const ground =
-        new THREE.Mesh(geometry, material);
+const ground =
+    new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            240,
+            240
+        ),
+        grassMaterial
+    );
 
-    ground.rotation.x = -Math.PI / 2;
+ground.rotation.x =
+    -Math.PI / 2;
 
-    scene.add(ground);
+ground.receiveShadow = true;
+
+scene.add(ground);
+
+
+/* =========================================================
+   DIRT ROAD
+========================================================= */
+
+box(
+    12,
+    .04,
+    190,
+    dirtMaterial,
+    0,
+    .02,
+    -20
+);
+
+
+/* =========================================================
+   FOREST
+========================================================= */
+
+const barkMaterial =
+    material(0x38281e);
+
+const leafMaterial =
+    material(0x172a1c);
+
+
+function createTree(
+    x,
+    z,
+    scale
+) {
+
+    cylinder(
+        .34 * scale,
+        3.4 * scale,
+        barkMaterial,
+        x,
+        1.7 * scale,
+        z
+    );
+
+
+    for (
+        let layer = 0;
+        layer < 4;
+        layer++
+    ) {
+
+        const crown =
+            new THREE.Mesh(
+                new THREE.ConeGeometry(
+                    (1.8 - layer * .2) * scale,
+                    2.1 * scale,
+                    8
+                ),
+                leafMaterial
+            );
+
+        crown.position.set(
+            x + (Math.random() - .5) * .35 * scale,
+            (2.5 + layer * .7) * scale,
+            z + (Math.random() - .5) * .35 * scale
+        );
+
+        crown.castShadow = true;
+
+        scene.add(crown);
+
+    }
+
+}
+
+
+/*
+   Lots of different tree sizes
+   and positions.
+*/
+
+for (
+    let i = 0;
+    i < 100;
+    i++
+) {
+
+    let x =
+        (Math.random() - .5) * 155;
+
+    let z =
+        (Math.random() - .5) * 155;
+
+
+    /*
+       Keep the main path clearer.
+    */
+
+    if (Math.abs(x) < 10) {
+
+        x +=
+            x < 0
+            ? -20
+            : 20;
+
+    }
+
+
+    if (
+        z > -48 &&
+        z < 10 &&
+        Math.abs(x) < 25
+    ) {
+
+        continue;
+
+    }
+
+
+    createTree(
+        x,
+        z,
+        .6 + Math.random() * 1.05
+    );
 
 }
 
 
 /* =========================================================
-   TREES
+   BUSHES
 ========================================================= */
 
-function createTree(x, z, scale=1) {
+for (
+    let i = 0;
+    i < 70;
+    i++
+) {
 
-    const trunkGeometry =
-        new THREE.CylinderGeometry(
-            0.35 * scale,
-            0.5 * scale,
-            5 * scale,
-            7
-        );
+    const x =
+        (Math.random() - .5) * 150;
 
-    const trunkMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x24160e
-        });
+    const z =
+        (Math.random() - .5) * 150;
 
-    const trunk =
+
+    const bush =
         new THREE.Mesh(
-            trunkGeometry,
-            trunkMaterial
+            new THREE.SphereGeometry(
+                .75 + Math.random() * .5,
+                7,
+                5
+            ),
+            material(0x20371f)
         );
 
-    trunk.position.set(
+    bush.scale.y = .55;
+
+    bush.position.set(
         x,
-        2.5 * scale,
+        .45,
         z
     );
 
-    scene.add(trunk);
+    bush.castShadow = true;
 
-
-    const leavesGeometry =
-        new THREE.ConeGeometry(
-            2.2 * scale,
-            5 * scale,
-            8
-        );
-
-    const leavesMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x071408
-        });
-
-
-    const leaves =
-        new THREE.Mesh(
-            leavesGeometry,
-            leavesMaterial
-        );
-
-    leaves.position.set(
-        x,
-        6 * scale,
-        z
-    );
-
-    scene.add(leaves);
+    scene.add(bush);
 
 }
 
 
-function createForest() {
+/* =========================================================
+   ROCKS
+========================================================= */
 
-    for (let i = 0; i < 240; i++) {
+for (
+    let i = 0;
+    i < 40;
+    i++
+) {
 
-        let x =
-            (Math.random() - 0.5) * 180;
+    const radius =
+        .2 + Math.random() * .55;
 
-        let z =
-            (Math.random() - 0.5) * 180;
-
-        // Keep central diner area clear
-
-        if (
-            Math.abs(x) < 14 &&
-            Math.abs(z) < 14
-        ) continue;
-
-        createTree(
-            x,
-            z,
-            0.7 + Math.random() * 1.5
+    const rock =
+        new THREE.Mesh(
+            new THREE.DodecahedronGeometry(
+                radius,
+                0
+            ),
+            material(0x474840)
         );
 
-    }
+    rock.position.set(
+        (Math.random() - .5) * 145,
+        radius / 2,
+        (Math.random() - .5) * 145
+    );
+
+    rock.rotation.set(
+        Math.random(),
+        Math.random(),
+        Math.random()
+    );
+
+    rock.castShadow = true;
+
+    scene.add(rock);
 
 }
 
@@ -684,452 +705,859 @@ function createForest() {
    DINER
 ========================================================= */
 
-function createDiner() {
+const dinerZ = -58;
 
-    const buildingGeometry =
-        new THREE.BoxGeometry(
-            18,
-            7,
+
+/* Main building */
+
+box(
+    20,
+    8,
+    16,
+    material(0x464540),
+    0,
+    4,
+    dinerZ
+);
+
+
+/* Roof */
+
+box(
+    20.5,
+    .35,
+    16.5,
+    material(0x202328),
+    0,
+    8.15,
+    dinerZ
+);
+
+
+/* =========================================================
+   DINER WINDOWS
+========================================================= */
+
+const glass =
+    material(
+        0x28444f,
+        .25
+    );
+
+
+for (
+    const x of [-7, -3, 3, 7]
+) {
+
+    box(
+        3.2,
+        3.1,
+        .12,
+        glass,
+        x,
+        4.2,
+        dinerZ - 8.05
+    );
+
+}
+
+
+/* =========================================================
+   DINER DOOR
+========================================================= */
+
+box(
+    2.2,
+    4.2,
+    .15,
+    material(0x151719),
+    0,
+    2.3,
+    dinerZ - 8.12
+);
+
+box(
+    1.7,
+    3.7,
+    .08,
+    glass,
+    0,
+    2.35,
+    dinerZ - 8.2
+);
+
+
+/* =========================================================
+   DINER INTERIOR
+========================================================= */
+
+
+/* Counter */
+
+box(
+    11,
+    1.1,
+    2,
+    material(0x704b31),
+    0,
+    1.35,
+    dinerZ + 1
+);
+
+
+/* Booths */
+
+for (
+    const x of [-6, -2, 2, 6]
+) {
+
+    box(
+        3.4,
+        .25,
+        1.5,
+        material(0x713f35),
+        x,
+        1.1,
+        dinerZ - 2
+    );
+
+    box(
+        3.4,
+        .25,
+        1.5,
+        material(0x713f35),
+        x,
+        1.1,
+        dinerZ - 10
+    );
+
+}
+
+
+/* Tables */
+
+for (
+    const x of [-6, 0, 6]
+) {
+
+    box(
+        2.1,
+        .2,
+        2,
+        material(0x63452f),
+        x,
+        1.25,
+        dinerZ + 5
+    );
+
+    cylinder(
+        .13,
+        1.2,
+        material(0x29231f),
+        x,
+        .65,
+        dinerZ + 5
+    );
+
+}
+
+
+/* =========================================================
+   DINER LIGHTS
+========================================================= */
+
+for (
+    const x of [-6, 0, 6]
+) {
+
+    const light =
+        new THREE.PointLight(
+            0xffd9a0,
+            5,
             13
         );
 
-    const buildingMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x302c28,
-            roughness: 0.8
-        });
-
-    const building =
-        new THREE.Mesh(
-            buildingGeometry,
-            buildingMaterial
-        );
-
-    building.position.set(
-        0,
-        3.5,
-        0
+    light.position.set(
+        x,
+        7,
+        dinerZ
     );
 
-    scene.add(building);
+    scene.add(light);
+
+}
 
 
-    // Roof
+/* Exterior neon light */
 
-    const roofGeometry =
+const neon =
+    new THREE.PointLight(
+        0xb9d9ff,
+        8,
+        28
+    );
+
+neon.position.set(
+    0,
+    8.5,
+    dinerZ - 9
+);
+
+scene.add(neon);
+
+
+/* =========================================================
+   DINER SIGN
+========================================================= */
+
+const signCanvas =
+    document.createElement(
+        "canvas"
+    );
+
+signCanvas.width = 1024;
+signCanvas.height = 220;
+
+const ctx =
+    signCanvas.getContext("2d");
+
+ctx.fillStyle = "#111";
+ctx.fillRect(
+    0,
+    0,
+    1024,
+    220
+);
+
+ctx.font =
+    "bold 120px Arial";
+
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+
+ctx.fillStyle = "#fff";
+
+ctx.fillText(
+    "NIGHTFALL DINER",
+    512,
+    110
+);
+
+
+const signTexture =
+    new THREE.CanvasTexture(
+        signCanvas
+    );
+
+
+const sign =
+    new THREE.Mesh(
         new THREE.BoxGeometry(
-            19,
-            1,
-            14
-        );
-
-    const roofMaterial =
+            10,
+            2.2,
+            .3
+        ),
         new THREE.MeshStandardMaterial({
-            color: 0x171717
-        });
-
-    const roof =
-        new THREE.Mesh(
-            roofGeometry,
-            roofMaterial
-        );
-
-    roof.position.set(
-        0,
-        7.5,
-        0
+            map: signTexture,
+            emissive: 0x8899aa,
+            emissiveIntensity: 1.5
+        })
     );
 
-    scene.add(roof);
+
+sign.position.set(
+    0,
+    10,
+    dinerZ - 8.6
+);
+
+scene.add(sign);
 
 
-    // Neon sign
+/* =========================================================
+   INTERACTABLE ITEMS
+========================================================= */
 
-    const signGeometry =
-        new THREE.BoxGeometry(
-            9,
-            1.5,
-            0.3
-        );
+function registerItem(
+    object,
+    type,
+    name
+) {
 
-    const signMaterial =
-        new THREE.MeshBasicMaterial({
-            color: 0xff2222
-        });
+    object.userData = {
+        type: type,
+        name: name
+    };
 
-    const sign =
-        new THREE.Mesh(
-            signGeometry,
-            signMaterial
-        );
-
-    sign.position.set(
-        0,
-        8.8,
-        6.7
+    interactables.push(
+        object
     );
 
-    scene.add(sign);
-
-
-    // Windows
-
-    for (let x = -6; x <= 6; x += 4) {
-
-        const windowGeometry =
-            new THREE.BoxGeometry(
-                2.5,
-                2.2,
-                0.2
-            );
-
-        const windowMaterial =
-            new THREE.MeshBasicMaterial({
-                color: 0xffaa55
-            });
-
-        const win =
-            new THREE.Mesh(
-                windowGeometry,
-                windowMaterial
-            );
-
-        win.position.set(
-            x,
-            4.2,
-            6.55
-        );
-
-        scene.add(win);
-
-    }
-
-
-    // Kitchen table
-
-    const tableGeometry =
-        new THREE.BoxGeometry(
-            5,
-            1,
-            3
-        );
-
-    const tableMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x251b15
-        });
-
-    const table =
-        new THREE.Mesh(
-            tableGeometry,
-            tableMaterial
-        );
-
-    table.position.set(
-        0,
-        1.2,
-        -2
-    );
-
-    scene.add(table);
-
-
-    // Stove
-
-    const stoveGeometry =
-        new THREE.BoxGeometry(
-            3,
-            1,
-            2
-        );
-
-    const stoveMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x151515
-        });
-
-    const stove =
-        new THREE.Mesh(
-            stoveGeometry,
-            stoveMaterial
-        );
-
-    stove.position.set(
-        0,
-        2,
-        -4
-    );
-
-    scene.add(stove);
+    scene.add(object);
 
 }
 
 
 /* =========================================================
-   PLAYER
+   BATTERY
 ========================================================= */
 
-function createPlayer() {
+function createBattery(
+    x,
+    y,
+    z
+) {
 
-    player = new THREE.Object3D();
+    const group =
+        new THREE.Group();
 
-    player.position.set(
-        0,
-        1.7,
-        18
-    );
-
-    scene.add(player);
-
-    player.add(camera);
-
-    camera.position.set(
-        0,
-        0,
-        0
-    );
-
-}
-
-
-/* =========================================================
-   HUNTER
-========================================================= */
-
-function createHunter() {
-
-    hunter = new THREE.Group();
-
-    const bodyGeometry =
-        new THREE.SphereGeometry(
-            1.4,
-            12,
-            12
-        );
-
-    const bodyMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x050505
-        });
 
     const body =
         new THREE.Mesh(
-            bodyGeometry,
-            bodyMaterial
+            new THREE.CylinderGeometry(
+                .22,
+                .22,
+                .72,
+                12
+            ),
+            material(0xd7d7d7)
         );
 
-    body.scale.y = 1.5;
+    body.rotation.z =
+        Math.PI / 2;
 
-    body.position.y = 1.7;
-
-    hunter.add(body);
+    group.add(body);
 
 
-    const headGeometry =
-        new THREE.SphereGeometry(
-            0.9,
-            12,
-            12
-        );
-
-    const head =
+    const cap =
         new THREE.Mesh(
-            headGeometry,
-            bodyMaterial
+            new THREE.CylinderGeometry(
+                .12,
+                .12,
+                .1,
+                12
+            ),
+            material(0xc5cbd0)
         );
 
-    head.position.y = 3.7;
+    cap.rotation.z =
+        Math.PI / 2;
 
-    hunter.add(head);
+    cap.position.x =
+        .4;
 
-
-    // Eyes
-
-    const eyeMaterial =
-        new THREE.MeshBasicMaterial({
-            color: 0xff0000
-        });
+    group.add(cap);
 
 
-    const eye1 =
-        new THREE.Mesh(
-            new THREE.SphereGeometry(.12, 8, 8),
-            eyeMaterial
-        );
-
-    const eye2 =
-        eye1.clone();
-
-    eye1.position.set(
-        -.3,
-        3.8,
-        -.8
-    );
-
-    eye2.position.set(
-        .3,
-        3.8,
-        -.8
-    );
-
-    hunter.add(eye1);
-    hunter.add(eye2);
-
-
-    hunter.position.set(
-        35,
-        0,
-        -35
-    );
-
-    scene.add(hunter);
-
-}
-
-
-/* =========================================================
-   RANDOM POSITION
-========================================================= */
-
-function randomForestPosition() {
-
-    let x, z;
-
-    do {
-
-        x =
-            (Math.random() - .5) * 140;
-
-        z =
-            (Math.random() - .5) * 140;
-
-    } while (
-        Math.abs(x) < 13 &&
-        Math.abs(z) < 13
-    );
-
-    return {
+    group.position.set(
         x,
+        y,
         z
-    };
+    );
+
+
+    registerItem(
+        group,
+        "battery",
+        "Battery"
+    );
 
 }
 
 
 /* =========================================================
-   PICKUPS
+   CHICKEN
 ========================================================= */
 
-function createPickup(
-    color,
+function createChicken(
     x,
-    z,
-    label
+    y,
+    z
 ) {
 
-    const geometry =
-        new THREE.BoxGeometry(
-            .7,
-            .7,
-            .7
-        );
+    const group =
+        new THREE.Group();
 
-    const material =
-        new THREE.MeshStandardMaterial({
-            color: color,
-            emissive: color,
-            emissiveIntensity: .3
-        });
 
-    const obj =
+    const meat =
         new THREE.Mesh(
-            geometry,
-            material
+            new THREE.SphereGeometry(
+                .38,
+                10,
+                7
+            ),
+            material(0xb86c3c)
         );
 
-    obj.position.set(
+    meat.scale.set(
+        1.25,
+        .65,
+        .75
+    );
+
+    group.add(meat);
+
+
+    const bone =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .08,
+                .08,
+                .65,
+                10
+            ),
+            material(0xe8d6b5)
+        );
+
+    bone.rotation.z =
+        Math.PI / 2;
+
+    bone.position.x =
+        .42;
+
+    group.add(bone);
+
+
+    group.position.set(
         x,
-        .6,
+        y,
         z
     );
 
-    obj.userData.label = label;
 
-    scene.add(obj);
-
-    return obj;
+    registerItem(
+        group,
+        "chicken",
+        "Chicken"
+    );
 
 }
 
 
-function spawnIngredients() {
+/* =========================================================
+   SPEAKER
+========================================================= */
 
-    const types = [
-        ["chicken", 0xff8844],
-        ["sauce", 0xff2222],
-        ["wrap", 0xe0c080]
-    ];
+function createSpeaker(
+    x,
+    y,
+    z
+) {
 
-    for (const [type, color] of types) {
+    const group =
+        new THREE.Group();
 
-        const p =
-            randomForestPosition();
 
-        const obj =
-            createPickup(
-                color,
-                p.x,
-                p.z,
-                type
+    const body =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                .9,
+                1.2,
+                .55
+            ),
+            material(0x202326)
+        );
+
+    group.add(body);
+
+
+    const grille =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                .65,
+                .75,
+                .05
+            ),
+            material(0x0b0c0d)
+        );
+
+    grille.position.z =
+        -.3;
+
+    group.add(grille);
+
+
+    group.position.set(
+        x,
+        y,
+        z
+    );
+
+
+    registerItem(
+        group,
+        "speaker",
+        "Speaker"
+    );
+
+}
+
+
+/* Place items */
+
+createBattery(
+    -13,
+    1,
+    -8
+);
+
+createBattery(
+    12,
+    1,
+    -32
+);
+
+createBattery(
+    -7,
+    1,
+    -52
+);
+
+createBattery(
+    6,
+    1,
+    -72
+);
+
+
+createChicken(
+    4,
+    1.75,
+    -57
+);
+
+createChicken(
+    -4,
+    1.75,
+    -55
+);
+
+
+createSpeaker(
+    10,
+    1.3,
+    -55
+);
+
+
+/* =========================================================
+   WHITE HUNTER
+========================================================= */
+
+const hunter =
+    new THREE.Group();
+
+
+const whiteMaterial =
+    material(
+        0xf5f5f5,
+        .75
+    );
+
+
+/* Body */
+
+const hunterBody =
+    new THREE.Mesh(
+        new THREE.CapsuleGeometry(
+            .55,
+            2.5,
+            8,
+            16
+        ),
+        whiteMaterial
+    );
+
+hunterBody.position.y = 2;
+
+hunter.add(
+    hunterBody
+);
+
+
+/* Head */
+
+const hunterHead =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .65,
+            16,
+            12
+        ),
+        whiteMaterial
+    );
+
+hunterHead.position.y =
+    4.05;
+
+hunter.add(
+    hunterHead
+);
+
+
+/* Arms and legs */
+
+for (
+    const side of [-1, 1]
+) {
+
+    const arm =
+        new THREE.Mesh(
+            new THREE.CapsuleGeometry(
+                .18,
+                2.2,
+                6,
+                10
+            ),
+            whiteMaterial
+        );
+
+    arm.position.set(
+        side * .82,
+        2.3,
+        0
+    );
+
+    hunter.add(arm);
+
+
+    const leg =
+        new THREE.Mesh(
+            new THREE.CapsuleGeometry(
+                .2,
+                2.4,
+                6,
+                10
+            ),
+            whiteMaterial
+        );
+
+    leg.position.set(
+        side * .32,
+        .2,
+        0
+    );
+
+    hunter.add(leg);
+
+
+    const eye =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .1,
+                8,
+                8
+            ),
+            material(0x111111)
+        );
+
+    eye.position.set(
+        side * .22,
+        4.15,
+        -.57
+    );
+
+    hunter.add(eye);
+
+}
+
+
+/*
+   Put the hunter in the forest.
+
+   White against the dark forest makes
+   it clearly visible.
+*/
+
+hunter.position.set(
+    18,
+    0,
+    -5
+);
+
+scene.add(hunter);
+
+
+/* =========================================================
+   ITEM INTERACTION
+========================================================= */
+
+function interact() {
+
+    const forward =
+        new THREE.Vector3(
+            0,
+            0,
+            -1
+        ).applyQuaternion(
+            camera.quaternion
+        );
+
+
+    let closest = null;
+    let closestDistance = 3.2;
+
+
+    for (
+        const item of interactables
+    ) {
+
+        const distance =
+            camera.position.distanceTo(
+                item.position
             );
 
-        obj.userData.type = type;
 
-        ingredientObjects.push(obj);
+        const direction =
+            item.position
+                .clone()
+                .sub(camera.position)
+                .normalize();
+
+
+        if (
+            distance < closestDistance &&
+            forward.dot(direction) > .45
+        ) {
+
+            closest =
+                item;
+
+            closestDistance =
+                distance;
+
+        }
 
     }
 
-}
+
+    if (!closest) {
+        return;
+    }
 
 
-function spawnBatteries() {
+    const type =
+        closest.userData.type;
 
-    for (let i = 0; i < 7; i++) {
 
-        const p =
-            randomForestPosition();
+    if (
+        type === "battery"
+    ) {
 
-        const obj =
-            createPickup(
-                0xffff55,
-                p.x,
-                p.z,
-                "battery"
+        battery =
+            Math.min(
+                100,
+                battery + 35
             );
 
-        batteries.push(obj);
+        setObjective(
+            "Battery collected. Flashlight charge restored."
+        );
 
     }
 
+    else if (
+        type === "chicken"
+    ) {
+
+        setObjective(
+            "Chicken collected."
+        );
+
+    }
+
+    else if (
+        type === "speaker"
+    ) {
+
+        setObjective(
+            "Speaker collected. Something is playing..."
+        );
+
+    }
+
+
+    scene.remove(
+        closest
+    );
+
+
+    interactables =
+        interactables.filter(
+            item =>
+                item !== closest
+        );
+
+
+    collectedItems++;
+
+
+    document.getElementById(
+        "items"
+    ).textContent =
+        collectedItems;
+
 }
 
 
-function spawnHealthPacks() {
+/* =========================================================
+   INTERACTION PROMPT
+========================================================= */
 
-    for (let i = 0; i < 5; i++) {
+function updatePrompt() {
 
-        const p =
-            randomForestPosition();
+    const prompt =
+        document.getElementById(
+            "prompt"
+        );
 
-        const obj =
-            createPickup(
-                0x44ff66,
-                p.x,
-                p.z,
-                "health"
+    prompt.style.display =
+        "none";
+
+
+    const forward =
+        new THREE.Vector3(
+            0,
+            0,
+            -1
+        ).applyQuaternion(
+            camera.quaternion
+        );
+
+
+    for (
+        const item of interactables
+    ) {
+
+        const distance =
+            camera.position.distanceTo(
+                item.position
             );
 
-        healthPacks.push(obj);
+
+        const direction =
+            item.position
+                .clone()
+                .sub(camera.position)
+                .normalize();
+
+
+        if (
+            distance < 3.2 &&
+            forward.dot(direction) > .45
+        ) {
+
+            prompt.textContent =
+                "[E] PICK UP " +
+                item.userData.name
+                    .toUpperCase();
+
+            prompt.style.display =
+                "block";
+
+            break;
+
+        }
 
     }
 
@@ -1137,278 +1565,14 @@ function spawnHealthPacks() {
 
 
 /* =========================================================
-   INPUT
+   OBJECTIVE
 ========================================================= */
 
-function setupInput() {
-
-    window.addEventListener(
-        "keydown",
-        e => {
-
-            keys[e.key.toLowerCase()] = true;
-
-            if (e.key.toLowerCase() === "e") {
-                interact();
-            }
-
-            if (
-                e.key === "Shift"
-            ) {
-                keys.shift = true;
-            }
-
-        }
-    );
-
-
-    window.addEventListener(
-        "keyup",
-        e => {
-
-            keys[e.key.toLowerCase()] = false;
-
-            if (e.key === "Shift") {
-                keys.shift = false;
-            }
-
-        }
-    );
-
-
-    renderer.domElement.addEventListener(
-        "click",
-        () => {
-
-            if (
-                document.pointerLockElement !== renderer.domElement
-            ) {
-
-                renderer.domElement.requestPointerLock();
-
-            }
-
-        }
-    );
-
-
-    document.addEventListener(
-        "mousemove",
-        e => {
-
-            if (
-                document.pointerLockElement !== renderer.domElement
-            ) return;
-
-            yaw -= e.movementX * 0.002;
-            pitch -= e.movementY * 0.002;
-
-            pitch =
-                Math.max(
-                    -1.4,
-                    Math.min(1.4, pitch)
-                );
-
-        }
-    );
-
-
-    setupMobileControls();
-
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-let mobileX = 0;
-let mobileY = 0;
-let sprinting = false;
-
-function setupMobileControls() {
-
-    const joystick =
-        document.getElementById("joystick");
-
-    const stick =
-        document.getElementById("stick");
-
-    let active = false;
-    let pointerId = null;
-
-    joystick.addEventListener(
-        "pointerdown",
-        e => {
-
-            active = true;
-            pointerId = e.pointerId;
-
-            joystick.setPointerCapture(pointerId);
-
-        }
-    );
-
-
-    joystick.addEventListener(
-        "pointermove",
-        e => {
-
-            if (!active) return;
-
-            const rect =
-                joystick.getBoundingClientRect();
-
-            const cx =
-                rect.left + rect.width / 2;
-
-            const cy =
-                rect.top + rect.height / 2;
-
-            let dx =
-                e.clientX - cx;
-
-            let dy =
-                e.clientY - cy;
-
-            const max = 42;
-
-            const distance =
-                Math.hypot(dx, dy);
-
-            if (distance > max) {
-
-                dx =
-                    dx / distance * max;
-
-                dy =
-                    dy / distance * max;
-
-            }
-
-            stick.style.left =
-                (38 + dx) + "px";
-
-            stick.style.top =
-                (38 + dy) + "px";
-
-            mobileX = dx / max;
-            mobileY = dy / max;
-
-        }
-    );
-
-
-    joystick.addEventListener(
-        "pointerup",
-        resetJoystick
-    );
-
-    joystick.addEventListener(
-        "pointercancel",
-        resetJoystick
-    );
-
-
-    function resetJoystick() {
-
-        active = false;
-
-        mobileX = 0;
-        mobileY = 0;
-
-        stick.style.left = "38px";
-        stick.style.top = "38px";
-
-    }
-
-
-    document
-        .getElementById("sprint")
-        .addEventListener(
-            "pointerdown",
-            () => sprinting = true
-        );
-
-    document
-        .getElementById("sprint")
-        .addEventListener(
-            "pointerup",
-            () => sprinting = false
-        );
-
-    document
-        .getElementById("sprint")
-        .addEventListener(
-            "pointercancel",
-            () => sprinting = false
-        );
-
-
-    document
-        .getElementById("interact")
-        .addEventListener(
-            "pointerdown",
-            interact
-        );
-
-
-    const look =
-        document.getElementById("lookArea");
-
-    let lastX = null;
-    let lastY = null;
-
-    look.addEventListener(
-        "pointerdown",
-        e => {
-
-            lastX = e.clientX;
-            lastY = e.clientY;
-
-            look.setPointerCapture(e.pointerId);
-
-        }
-    );
-
-
-    look.addEventListener(
-        "pointermove",
-        e => {
-
-            if (lastX === null) return;
-
-            const dx =
-                e.clientX - lastX;
-
-            const dy =
-                e.clientY - lastY;
-
-            yaw -= dx * .004;
-            pitch -= dy * .004;
-
-            pitch =
-                Math.max(
-                    -1.4,
-                    Math.min(1.4, pitch)
-                );
-
-            lastX = e.clientX;
-            lastY = e.clientY;
-
-        }
-    );
-
-
-    look.addEventListener(
-        "pointerup",
-        () => {
-
-            lastX = null;
-            lastY = null;
-
-        }
-    );
+function setObjective(text) {
+
+    document.getElementById(
+        "objective"
+    ).textContent = text;
 
 }
 
@@ -1417,532 +1581,75 @@ function setupMobileControls() {
    PLAYER MOVEMENT
 ========================================================= */
 
-function updatePlayer(dt) {
+function movement(dt) {
 
-    let forward = 0;
-    let right = 0;
-
-    if (
-        keys.w ||
-        keys.arrowup
-    ) forward += 1;
-
-    if (
-        keys.s ||
-        keys.arrowdown
-    ) forward -= 1;
-
-    if (
-        keys.d ||
-        keys.arrowright
-    ) right += 1;
-
-    if (
-        keys.a ||
-        keys.arrowleft
-    ) right -= 1;
+    const speed = 6;
 
 
-    if (
-        Math.abs(mobileX) > .1 ||
-        Math.abs(mobileY) > .1
-    ) {
+    if (keys.KeyW) {
 
-        right = mobileX;
-        forward = -mobileY;
+        controls.moveForward(
+            speed * dt
+        );
 
     }
 
 
-    const speed =
-        keys.shift || sprinting
-            ? 7
-            : 4;
+    if (keys.KeyS) {
 
-
-    const direction =
-        new THREE.Vector3(
-            right,
-            0,
-            -forward
+        controls.moveForward(
+            -speed * dt
         );
 
+    }
 
-    if (direction.length() > 0) {
 
-        direction.normalize();
+    if (keys.KeyA) {
 
-        direction.applyAxisAngle(
-            new THREE.Vector3(0,1,0),
-            yaw
+        controls.moveRight(
+            -speed * dt
         );
 
-        player.position.add(
-            direction.multiplyScalar(
-                speed * dt
+    }
+
+
+    if (keys.KeyD) {
+
+        controls.moveRight(
+            speed * dt
+        );
+
+    }
+
+
+    camera.position.y =
+        1.7;
+
+
+    camera.position.x =
+        Math.max(
+            -100,
+            Math.min(
+                100,
+                camera.position.x
             )
         );
 
-    }
 
-
-    player.position.y = 1.7;
-
-
-    // flashlight
-
-    flashlight.position.copy(
-        player.position
-    );
-
-    flashlightTarget.position.copy(
-        player.position
-    );
-
-    const target =
-        new THREE.Vector3(
-            Math.sin(yaw) * Math.cos(pitch),
-            Math.sin(pitch),
-            -Math.cos(yaw) * Math.cos(pitch)
-        );
-
-    flashlightTarget.position.add(
-        target.multiplyScalar(10)
-    );
-
-
-    camera.rotation.set(
-        pitch,
-        yaw,
-        0,
-        "YXZ"
-    );
-
-
-    // Battery drains while flashlight is active
-
-    battery -= dt * .7;
-
-    if (battery < 0) {
-        battery = 0;
-        flashlight.intensity = 0;
-    } else {
-        flashlight.intensity =
-            battery > 5
-                ? 8
-                : Math.random() * 5;
-    }
-
-}
-
-
-/* =========================================================
-   INTERACTION
-========================================================= */
-
-function interact() {
-
-    if (!gameStarted || gameOver) return;
-
-
-    // Ingredients
-
-    for (let i = ingredientObjects.length - 1; i >= 0; i--) {
-
-        const obj =
-            ingredientObjects[i];
-
-        if (
-            player.position.distanceTo(
-                obj.position
-            ) < 3
-        ) {
-
-            const type =
-                obj.userData.type;
-
-            ingredients[type] = true;
-
-            scene.remove(obj);
-
-            ingredientObjects.splice(i,1);
-
-            updateUI();
-
-            playSound(
-                600,
-                .15,
-                .08
-            );
-
-            showMessage(
-                type.toUpperCase() +
-                " FOUND"
-            );
-
-            return;
-
-        }
-
-    }
-
-
-    // Batteries
-
-    for (let i = batteries.length - 1; i >= 0; i--) {
-
-        const obj = batteries[i];
-
-        if (
-            player.position.distanceTo(
-                obj.position
-            ) < 3
-        ) {
-
-            battery =
-                Math.min(
-                    100,
-                    battery + 30
-                );
-
-            scene.remove(obj);
-
-            batteries.splice(i,1);
-
-            playSound(
-                850,
-                .12,
-                .08
-            );
-
-            showMessage(
-                "BATTERY +30%"
-            );
-
-            return;
-
-        }
-
-    }
-
-
-    // Health packs
-
-    for (let i = healthPacks.length - 1; i >= 0; i--) {
-
-        const obj =
-            healthPacks[i];
-
-        if (
-            player.position.distanceTo(
-                obj.position
-            ) < 3
-        ) {
-
-            health =
-                Math.min(
-                    100,
-                    health + 35
-                );
-
-            scene.remove(obj);
-
-            healthPacks.splice(i,1);
-
-            playSound(
-                500,
-                .2,
-                .08
-            );
-
-            showMessage(
-                "MEDKIT +35 HEALTH"
-            );
-
-            updateUI();
-
-            return;
-
-        }
-
-    }
-
-
-    // Cooking
-
-    if (
-        ingredients.chicken &&
-        ingredients.sauce &&
-        ingredients.wrap &&
-        player.position.distanceTo(
-            new THREE.Vector3(
-                0,
-                1.7,
-                -4
-            )
-        ) < 5
-    ) {
-
-        winGame();
-
-    }
-
-}
-
-
-/* =========================================================
-   HUNTER AI
-========================================================= */
-
-function updateHunter(dt) {
-
-    const distance =
-        hunter.position.distanceTo(
-            player.position
-        );
-
-
-    // Hunter becomes faster when close
-
-    let speed =
-        hunterSpeed;
-
-    if (distance < 25) {
-
-        speed = 2.8;
-
-    }
-
-    if (distance < 12) {
-
-        speed = 3.8;
-
-    }
-
-
-    // Move toward player
-
-    const direction =
-        new THREE.Vector3()
-            .subVectors(
-                player.position,
-                hunter.position
-            );
-
-
-    direction.y = 0;
-
-    if (direction.length() > 0) {
-
-        direction.normalize();
-
-        hunter.position.add(
-            direction.multiplyScalar(
-                speed * dt
+    camera.position.z =
+        Math.max(
+            -100,
+            Math.min(
+                75,
+                camera.position.z
             )
         );
 
-    }
-
-
-    hunter.lookAt(
-        player.position.x,
-        hunter.position.y,
-        player.position.z
-    );
-
-
-    // Damage
-
-    if (distance < 3) {
-
-        health -= 22 * dt;
-
-        damageUI.style.opacity =
-            Math.random() * .7;
-
-        if (health <= 0) {
-
-            health = 0;
-
-            loseGame();
-
-        }
-
-    } else {
-
-        damageUI.style.opacity = 0;
-
-    }
-
-
-    // Danger effect
-
-    if (distance < 35) {
-
-        const danger =
-            Math.max(
-                0,
-                1 - distance / 35
-            );
-
-        dangerUI.style.boxShadow =
-            `inset 0 0 ${120 + danger * 100}px rgba(140,0,0,${danger * .8})`;
-
-        if (
-            Math.random() < .01
-        ) {
-
-            playSound(
-                70 + danger * 80,
-                .15,
-                .03,
-                "sawtooth"
-            );
-
-        }
-
-    } else {
-
-        dangerUI.style.boxShadow =
-            "inset 0 0 120px rgba(120,0,0,0)";
-
-    }
-
 }
 
 
 /* =========================================================
-   UI
-========================================================= */
-
-function updateUI() {
-
-    healthUI.textContent =
-        Math.round(health);
-
-    batteryUI.textContent =
-        Math.round(battery);
-
-    chickenUI.textContent =
-        ingredients.chicken ? 1 : 0;
-
-    sauceUI.textContent =
-        ingredients.sauce ? 1 : 0;
-
-    wrapUI.textContent =
-        ingredients.wrap ? 1 : 0;
-
-
-    if (
-        ingredients.chicken &&
-        ingredients.sauce &&
-        ingredients.wrap
-    ) {
-
-        objectiveUI.innerHTML =
-            "ALL INGREDIENTS FOUND.<br>" +
-            "RETURN TO THE DINER.";
-
-    } else {
-
-        objectiveUI.innerHTML =
-            "OBJECTIVE:<br>" +
-            "Find the ingredients.";
-
-    }
-
-}
-
-
-function showMessage(text) {
-
-    messageUI.textContent = text;
-
-    messageTimer = 2;
-
-}
-
-
-/* =========================================================
-   WIN / LOSE
-========================================================= */
-
-function winGame() {
-
-    gameOver = true;
-
-    endTitle.textContent =
-        "YOU SURVIVED";
-
-    endTitle.style.color =
-        "#ffd000";
-
-    endText.textContent =
-        "The chicken roll is complete. The Hunter is still outside.";
-
-    endScreen.classList.remove(
-        "hidden"
-    );
-
-    playSound(
-        523,
-        .4,
-        .15
-    );
-
-}
-
-
-function loseGame() {
-
-    gameOver = true;
-
-    endTitle.textContent =
-        "CAUGHT";
-
-    endTitle.style.color =
-        "#d00000";
-
-    endText.textContent =
-        "The Hunter found you in the forest.";
-
-    endScreen.classList.remove(
-        "hidden"
-    );
-
-    playSound(
-        60,
-        1,
-        .2,
-        "sawtooth"
-    );
-
-}
-
-
-/* =========================================================
-   RESIZE
-========================================================= */
-
-function onResize() {
-
-    camera.aspect =
-        window.innerWidth /
-        window.innerHeight;
-
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-    );
-
-}
-
-
-/* =========================================================
-   ANIMATION
+   MAIN LOOP
 ========================================================= */
 
 function animate() {
@@ -1960,78 +1667,60 @@ function animate() {
 
 
     if (
-        !gameStarted ||
-        gameOver
+        controls.isLocked
     ) {
 
-        renderer.render(
-            scene,
-            camera
-        );
+        movement(dt);
 
-        return;
+
+        /*
+           100% -> 0%
+           over approximately FIVE MINUTES
+           of continuous flashlight use.
+        */
+
+        if (
+            flashlightOn &&
+            battery > 0
+        ) {
+
+            battery -=
+                100 /
+                (5 * 60) *
+                dt;
+
+
+            if (
+                battery < 0
+            ) {
+
+                battery = 0;
+
+            }
+
+        }
+
+
+        updateFlashlight();
+
+        updatePrompt();
 
     }
 
 
-    updatePlayer(dt);
-    updateHunter(dt);
+    document.getElementById(
+        "batteryText"
+    ).textContent =
+        Math.ceil(battery) + "%";
 
 
-    // Rotate pickups
-
-    ingredientObjects.forEach(
-        obj => {
-
-            obj.rotation.y +=
-                dt * 2;
-
-            obj.position.y =
-                .6 +
-                Math.sin(
-                    performance.now() / 400
-                ) * .1;
-
-        }
-    );
-
-
-    batteries.forEach(
-        obj => {
-
-            obj.rotation.y +=
-                dt * 2;
-
-        }
-    );
-
-
-    healthPacks.forEach(
-        obj => {
-
-            obj.rotation.y +=
-                dt * 2;
-
-        }
-    );
-
-
-    // Message timer
-
-    if (messageTimer > 0) {
-
-        messageTimer -= dt;
-
-        if (messageTimer <= 0) {
-
-            messageUI.textContent = "";
-
-        }
-
-    }
-
-
-    updateUI();
+    document.getElementById(
+        "batteryFill"
+    ).style.width =
+        Math.max(
+            0,
+            battery
+        ) + "%";
 
 
     renderer.render(
@@ -2040,6 +1729,71 @@ function animate() {
     );
 
 }
+
+
+animate();
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+document.getElementById(
+    "startButton"
+).onclick = () => {
+
+    controls.lock();
+
+};
+
+
+controls.addEventListener(
+    "lock",
+    () => {
+
+        document.getElementById(
+            "startScreen"
+        ).style.display =
+            "none";
+
+    }
+);
+
+
+controls.addEventListener(
+    "unlock",
+    () => {
+
+        document.getElementById(
+            "startScreen"
+        ).style.display =
+            "flex";
+
+    }
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+addEventListener(
+    "resize",
+    () => {
+
+        camera.aspect =
+            innerWidth /
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+
+    }
+);
 
 </script>
 
