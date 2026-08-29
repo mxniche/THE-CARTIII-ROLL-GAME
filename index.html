@@ -1,127 +1,208 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nightfall Diner V2</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Nightfall Diner V2.1</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#080b12;
+    font-family:Arial,sans-serif;
+    color:white;
+    touch-action:none;
 }
 
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #080b12;
-    font-family: Arial, sans-serif;
-    color: white;
+canvas{
+    display:block;
 }
 
-#hud {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 10;
+#startScreen{
+    position:fixed;
+    inset:0;
+    z-index:30;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    background:radial-gradient(circle,#1b2b40,#030507 75%);
 }
 
-#crosshair {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 5px;
-    height: 5px;
-    margin-left: -2.5px;
-    margin-top: -2.5px;
-    background: white;
-    border-radius: 50%;
+#startBox{
+    width:90%;
+    max-width:600px;
 }
 
-#batteryBox {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    width: 200px;
-    padding: 10px;
-    background: rgba(0,0,0,.6);
-    border-radius: 8px;
+#startBox h1{
+    font-size:42px;
+    letter-spacing:5px;
 }
 
-#batteryBar {
-    height: 8px;
-    margin-top: 6px;
-    background: #333;
-    border-radius: 5px;
-    overflow: hidden;
+button{
+    border:0;
+    border-radius:10px;
+    padding:15px 25px;
+    font-size:16px;
+    font-weight:bold;
 }
 
-#batteryFill {
-    height: 100%;
-    width: 100%;
-    background: #dcecff;
+#startButton{
+    margin-top:20px;
 }
 
-#inventory {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    padding: 10px 13px;
-    background: rgba(0,0,0,.55);
-    border-radius: 8px;
+#hud{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    pointer-events:none;
 }
 
-#objective {
-    position: absolute;
-    left: 20px;
-    bottom: 20px;
-    max-width: 380px;
-    padding: 12px;
-    background: rgba(0,0,0,.55);
-    border-radius: 8px;
+#crosshair{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:5px;
+    height:5px;
+    margin:-2.5px;
+    background:white;
+    border-radius:50%;
 }
 
-#prompt {
-    position: absolute;
-    left: 50%;
-    bottom: 15%;
-    transform: translateX(-50%);
-    display: none;
-    padding: 10px 16px;
-    background: rgba(0,0,0,.8);
-    border-radius: 7px;
+#batteryBox{
+    position:absolute;
+    right:18px;
+    top:18px;
+    width:190px;
+    padding:10px;
+    background:rgba(0,0,0,.55);
+    border-radius:8px;
 }
 
-#startScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background: radial-gradient(circle, #1b2a3c, #030507 75%);
+#batteryBar{
+    height:8px;
+    margin-top:6px;
+    background:#333;
+    border-radius:5px;
+    overflow:hidden;
 }
 
-#startBox {
-    max-width: 650px;
-    padding: 30px;
+#batteryFill{
+    height:100%;
+    width:100%;
+    background:#dcecff;
 }
 
-button {
-    padding: 14px 25px;
-    border: 0;
-    border-radius: 7px;
-    font-weight: bold;
-    cursor: pointer;
+#inventory{
+    position:absolute;
+    left:18px;
+    top:18px;
+    padding:10px 13px;
+    background:rgba(0,0,0,.55);
+    border-radius:8px;
 }
 
-.small {
-    opacity: .7;
-    font-size: 13px;
-    line-height: 1.6;
+#objective{
+    position:absolute;
+    left:18px;
+    bottom:18px;
+    max-width:350px;
+    padding:12px;
+    background:rgba(0,0,0,.55);
+    border-radius:8px;
+}
+
+#prompt{
+    position:absolute;
+    left:50%;
+    bottom:18%;
+    transform:translateX(-50%);
+    padding:10px 16px;
+    background:rgba(0,0,0,.75);
+    border-radius:8px;
+    display:none;
+}
+
+#mobileControls{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:15;
+    pointer-events:none;
+}
+
+.mobileButton{
+    position:absolute;
+    pointer-events:auto;
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:rgba(255,255,255,.18);
+    color:white;
+    border:1px solid rgba(255,255,255,.3);
+    backdrop-filter:blur(4px);
+}
+
+#joystick{
+    left:30px;
+    bottom:30px;
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.18);
+    pointer-events:auto;
+}
+
+#stick{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:65px;
+    height:65px;
+    margin:-32.5px;
+    border-radius:50%;
+    background:rgba(255,255,255,.25);
+}
+
+#lookArea{
+    position:absolute;
+    right:0;
+    top:0;
+    width:65%;
+    height:100%;
+    pointer-events:auto;
+}
+
+#flashButton{
+    right:25px;
+    bottom:115px;
+}
+
+#interactButton{
+    right:25px;
+    bottom:30px;
+}
+
+@media (pointer:coarse){
+    #mobileControls{
+        display:block;
+    }
+
+    #crosshair{
+        opacity:.5;
+    }
+}
+
+.small{
+    opacity:.7;
+    line-height:1.6;
+    font-size:13px;
 }
 </style>
 </head>
@@ -131,27 +212,32 @@ button {
 <div id="startScreen">
     <div id="startBox">
         <h1>NIGHTFALL DINER</h1>
-        <p>Something is watching from the forest.</p>
 
-        <p class="small">
-            WASD = Move<br>
-            Mouse = Look<br>
-            E = Collect / Interact<br>
-            F = Flashlight
+        <p>
+            Something is watching from the forest.
         </p>
 
-        <button id="startButton">ENTER THE FOREST</button>
+        <p class="small">
+            Explore the forest.<br>
+            Find batteries and investigate the diner.
+        </p>
+
+        <button id="startButton">
+            ENTER THE FOREST
+        </button>
     </div>
 </div>
+
 
 <div id="hud">
 
     <div id="inventory">
-        Items collected: <span id="items">0</span>
+        Items: <span id="items">0</span>
     </div>
 
     <div id="batteryBox">
-        Flashlight: <span id="batteryText">100%</span>
+        Flashlight:
+        <span id="batteryText">100%</span>
 
         <div id="batteryBar">
             <div id="batteryFill"></div>
@@ -168,42 +254,80 @@ button {
 
 </div>
 
+
+<div id="mobileControls">
+
+    <div id="lookArea"></div>
+
+    <div id="joystick">
+        <div id="stick"></div>
+    </div>
+
+    <button
+        id="flashButton"
+        class="mobileButton">
+        🔦
+    </button>
+
+    <button
+        id="interactButton"
+        class="mobileButton">
+        E
+    </button>
+
+</div>
+
+
 <script type="module">
 
 import * as THREE from
 "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js";
 
-import { PointerLockControls } from
-"https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/controls/PointerLockControls.js";
+
+/* =========================================================
+   SCENE
+========================================================= */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x111a29);
+
+scene.fog =
+    new THREE.FogExp2(
+        0x111a29,
+        0.017
+    );
 
 
 /* =========================================================
-   BASIC SETUP
+   CAMERA
 ========================================================= */
 
-const scene = new THREE.Scene();
+const camera =
+    new THREE.PerspectiveCamera(
+        72,
+        innerWidth / innerHeight,
+        .05,
+        500
+    );
 
-scene.background = new THREE.Color(0x111a29);
-
-scene.fog = new THREE.FogExp2(
-    0x111a29,
-    0.017
+camera.position.set(
+    0,
+    1.7,
+    30
 );
 
 
-const camera = new THREE.PerspectiveCamera(
-    72,
-    innerWidth / innerHeight,
-    0.05,
-    500
-);
+/* =========================================================
+   RENDERER
+========================================================= */
 
-camera.position.set(0, 1.7, 30);
-
-
-const renderer = new THREE.WebGLRenderer({
-    antialias: true
-});
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true
+    });
 
 renderer.setSize(
     innerWidth,
@@ -211,10 +335,14 @@ renderer.setSize(
 );
 
 renderer.setPixelRatio(
-    Math.min(devicePixelRatio, 2)
+    Math.min(
+        devicePixelRatio,
+        2
+    )
 );
 
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled =
+    true;
 
 renderer.shadowMap.type =
     THREE.PCFSoftShadowMap;
@@ -224,23 +352,11 @@ document.body.appendChild(
 );
 
 
-const controls =
-    new PointerLockControls(
-        camera,
-        document.body
-    );
-
-scene.add(camera);
-
-
-const clock = new THREE.Clock();
-
-
 /* =========================================================
    GAME VARIABLES
 ========================================================= */
 
-const keys = {};
+let gameStarted = false;
 
 let flashlightOn = true;
 
@@ -250,63 +366,48 @@ let collectedItems = 0;
 
 let interactables = [];
 
+let yaw = 0;
 
-/* =========================================================
-   KEYBOARD
-========================================================= */
+let pitch = 0;
 
-document.addEventListener("keydown", event => {
+let moveX = 0;
 
-    keys[event.code] = true;
-
-    if (event.code === "KeyF") {
-        flashlightOn = !flashlightOn;
-    }
-
-    if (event.code === "KeyE") {
-        interact();
-    }
-
-});
-
-
-document.addEventListener("keyup", event => {
-
-    keys[event.code] = false;
-
-});
+let moveY = 0;
 
 
 /* =========================================================
-   MATERIAL HELPERS
+   HELPERS
 ========================================================= */
 
-function material(color, roughness = 1) {
+function material(
+    color,
+    roughness = 1
+){
 
     return new THREE.MeshStandardMaterial({
-        color: color,
-        roughness: roughness
+        color:color,
+        roughness:roughness
     });
 
 }
 
 
 function box(
-    width,
-    height,
-    depth,
+    w,
+    h,
+    d,
     mat,
     x,
     y,
     z
-) {
+){
 
     const mesh =
         new THREE.Mesh(
             new THREE.BoxGeometry(
-                width,
-                height,
-                depth
+                w,
+                h,
+                d
             ),
             mat
         );
@@ -323,25 +424,24 @@ function box(
     scene.add(mesh);
 
     return mesh;
-
 }
 
 
 function cylinder(
-    radius,
-    height,
+    r,
+    h,
     mat,
     x,
     y,
     z
-) {
+){
 
     const mesh =
         new THREE.Mesh(
             new THREE.CylinderGeometry(
-                radius,
-                radius * .88,
-                height,
+                r,
+                r*.88,
+                h,
                 10
             ),
             mat
@@ -359,7 +459,6 @@ function cylinder(
     scene.add(mesh);
 
     return mesh;
-
 }
 
 
@@ -367,14 +466,13 @@ function cylinder(
    LIGHTING
 ========================================================= */
 
-const ambient =
+scene.add(
     new THREE.HemisphereLight(
         0x9dbdff,
         0x17110b,
         1.25
-    );
-
-scene.add(ambient);
+    )
+);
 
 
 const moon =
@@ -408,45 +506,35 @@ const flashlight =
         0xeaf4ff,
         90,
         44,
-        Math.PI / 7,
-        0.55,
+        Math.PI/7,
+        .55,
         1.4
     );
 
-flashlight.castShadow = true;
+flashlight.castShadow =
+    true;
 
-flashlight.shadow.mapSize.set(
-    1024,
-    1024
+scene.add(
+    flashlight
 );
-
-scene.add(flashlight);
 
 scene.add(
     flashlight.target
 );
 
 
-function updateFlashlight() {
-
-    /*
-       The flashlight is attached to the camera.
-
-       Therefore:
-       Look left  -> flashlight left
-       Look right -> flashlight right
-       Look up    -> flashlight up
-       Look down  -> flashlight down
-    */
+function updateFlashlight(){
 
     const direction =
         new THREE.Vector3(
             0,
             0,
             -1
-        ).applyQuaternion(
-            camera.quaternion
         );
+
+    direction.applyQuaternion(
+        camera.quaternion
+    );
 
     flashlight.position.copy(
         camera.position
@@ -454,14 +542,15 @@ function updateFlashlight() {
 
     flashlight.target.position.copy(
         camera.position
-    ).add(
+    );
+
+    flashlight.target.position.add(
         direction.multiplyScalar(20)
     );
 
     flashlight.visible =
         flashlightOn &&
         battery > 0;
-
 }
 
 
@@ -469,39 +558,33 @@ function updateFlashlight() {
    GROUND
 ========================================================= */
 
-const grassMaterial =
-    material(0x263720);
-
-const dirtMaterial =
-    material(0x4b3929);
-
-
 const ground =
     new THREE.Mesh(
         new THREE.PlaneGeometry(
             240,
             240
         ),
-        grassMaterial
+        material(0x263720)
     );
 
 ground.rotation.x =
-    -Math.PI / 2;
+    -Math.PI/2;
 
-ground.receiveShadow = true;
+ground.receiveShadow =
+    true;
 
 scene.add(ground);
 
 
 /* =========================================================
-   DIRT ROAD
+   ROAD
 ========================================================= */
 
 box(
     12,
     .04,
     190,
-    dirtMaterial,
+    material(0x4b3929),
     0,
     .02,
     -20
@@ -512,10 +595,10 @@ box(
    FOREST
 ========================================================= */
 
-const barkMaterial =
+const bark =
     material(0x38281e);
 
-const leafMaterial =
+const leaves =
     material(0x172a1c);
 
 
@@ -523,41 +606,42 @@ function createTree(
     x,
     z,
     scale
-) {
+){
 
     cylinder(
-        .34 * scale,
-        3.4 * scale,
-        barkMaterial,
+        .34*scale,
+        3.4*scale,
+        bark,
         x,
-        1.7 * scale,
+        1.7*scale,
         z
     );
 
 
-    for (
-        let layer = 0;
-        layer < 4;
-        layer++
-    ) {
+    for(
+        let i=0;
+        i<4;
+        i++
+    ){
 
         const crown =
             new THREE.Mesh(
                 new THREE.ConeGeometry(
-                    (1.8 - layer * .2) * scale,
-                    2.1 * scale,
+                    (1.8-i*.2)*scale,
+                    2.1*scale,
                     8
                 ),
-                leafMaterial
+                leaves
             );
 
         crown.position.set(
-            x + (Math.random() - .5) * .35 * scale,
-            (2.5 + layer * .7) * scale,
-            z + (Math.random() - .5) * .35 * scale
+            x+(Math.random()-.5)*.35*scale,
+            (2.5+i*.7)*scale,
+            z+(Math.random()-.5)*.35*scale
         );
 
-        crown.castShadow = true;
+        crown.castShadow =
+            true;
 
         scene.add(crown);
 
@@ -566,43 +650,36 @@ function createTree(
 }
 
 
-/*
-   Lots of different tree sizes
-   and positions.
-*/
-
-for (
-    let i = 0;
-    i < 100;
+for(
+    let i=0;
+    i<100;
     i++
-) {
+){
 
     let x =
-        (Math.random() - .5) * 155;
+        (Math.random()-.5)*155;
 
     let z =
-        (Math.random() - .5) * 155;
+        (Math.random()-.5)*155;
 
 
-    /*
-       Keep the main path clearer.
-    */
-
-    if (Math.abs(x) < 10) {
+    if(
+        Math.abs(x)<10
+    ){
 
         x +=
-            x < 0
+            x<0
             ? -20
             : 20;
 
     }
 
 
-    if (
-        z > -48 &&
-        z < 10 &&
-        Math.abs(x) < 25
-    ) {
+    if(
+        z>-48 &&
+        z<10 &&
+        Math.abs(x)<25
+    ){
 
         continue;
 
@@ -612,7 +689,7 @@ for (
     createTree(
         x,
         z,
-        .6 + Math.random() * 1.05
+        .6+Math.random()*1.05
     );
 
 }
@@ -622,38 +699,33 @@ for (
    BUSHES
 ========================================================= */
 
-for (
-    let i = 0;
-    i < 70;
+for(
+    let i=0;
+    i<70;
     i++
-) {
-
-    const x =
-        (Math.random() - .5) * 150;
-
-    const z =
-        (Math.random() - .5) * 150;
-
+){
 
     const bush =
         new THREE.Mesh(
             new THREE.SphereGeometry(
-                .75 + Math.random() * .5,
+                .75+Math.random()*.5,
                 7,
                 5
             ),
             material(0x20371f)
         );
 
-    bush.scale.y = .55;
+    bush.scale.y =
+        .55;
 
     bush.position.set(
-        x,
+        (Math.random()-.5)*150,
         .45,
-        z
+        (Math.random()-.5)*150
     );
 
-    bush.castShadow = true;
+    bush.castShadow =
+        true;
 
     scene.add(bush);
 
@@ -664,28 +736,28 @@ for (
    ROCKS
 ========================================================= */
 
-for (
-    let i = 0;
-    i < 40;
+for(
+    let i=0;
+    i<40;
     i++
-) {
+){
 
-    const radius =
-        .2 + Math.random() * .55;
+    const r =
+        .2+Math.random()*.55;
 
     const rock =
         new THREE.Mesh(
             new THREE.DodecahedronGeometry(
-                radius,
+                r,
                 0
             ),
             material(0x474840)
         );
 
     rock.position.set(
-        (Math.random() - .5) * 145,
-        radius / 2,
-        (Math.random() - .5) * 145
+        (Math.random()-.5)*145,
+        r/2,
+        (Math.random()-.5)*145
     );
 
     rock.rotation.set(
@@ -694,7 +766,8 @@ for (
         Math.random()
     );
 
-    rock.castShadow = true;
+    rock.castShadow =
+        true;
 
     scene.add(rock);
 
@@ -708,8 +781,6 @@ for (
 const dinerZ = -58;
 
 
-/* Main building */
-
 box(
     20,
     8,
@@ -720,8 +791,6 @@ box(
     dinerZ
 );
 
-
-/* Roof */
 
 box(
     20.5,
@@ -734,9 +803,7 @@ box(
 );
 
 
-/* =========================================================
-   DINER WINDOWS
-========================================================= */
+/* Windows */
 
 const glass =
     material(
@@ -745,9 +812,9 @@ const glass =
     );
 
 
-for (
-    const x of [-7, -3, 3, 7]
-) {
+for(
+    const x of [-7,-3,3,7]
+){
 
     box(
         3.2,
@@ -756,15 +823,13 @@ for (
         glass,
         x,
         4.2,
-        dinerZ - 8.05
+        dinerZ-8.05
     );
 
 }
 
 
-/* =========================================================
-   DINER DOOR
-========================================================= */
+/* Door */
 
 box(
     2.2,
@@ -773,7 +838,7 @@ box(
     material(0x151719),
     0,
     2.3,
-    dinerZ - 8.12
+    dinerZ-8.12
 );
 
 box(
@@ -783,16 +848,13 @@ box(
     glass,
     0,
     2.35,
-    dinerZ - 8.2
+    dinerZ-8.2
 );
 
 
 /* =========================================================
    DINER INTERIOR
 ========================================================= */
-
-
-/* Counter */
 
 box(
     11,
@@ -801,15 +863,13 @@ box(
     material(0x704b31),
     0,
     1.35,
-    dinerZ + 1
+    dinerZ+1
 );
 
 
-/* Booths */
-
-for (
-    const x of [-6, -2, 2, 6]
-) {
+for(
+    const x of [-6,-2,2,6]
+){
 
     box(
         3.4,
@@ -818,7 +878,7 @@ for (
         material(0x713f35),
         x,
         1.1,
-        dinerZ - 2
+        dinerZ-2
     );
 
     box(
@@ -828,17 +888,15 @@ for (
         material(0x713f35),
         x,
         1.1,
-        dinerZ - 10
+        dinerZ-10
     );
 
 }
 
 
-/* Tables */
-
-for (
-    const x of [-6, 0, 6]
-) {
+for(
+    const x of [-6,0,6]
+){
 
     box(
         2.1,
@@ -847,7 +905,7 @@ for (
         material(0x63452f),
         x,
         1.25,
-        dinerZ + 5
+        dinerZ+5
     );
 
     cylinder(
@@ -856,7 +914,7 @@ for (
         material(0x29231f),
         x,
         .65,
-        dinerZ + 5
+        dinerZ+5
     );
 
 }
@@ -866,9 +924,9 @@ for (
    DINER LIGHTS
 ========================================================= */
 
-for (
-    const x of [-6, 0, 6]
-) {
+for(
+    const x of [-6,0,6]
+){
 
     const light =
         new THREE.PointLight(
@@ -888,8 +946,6 @@ for (
 }
 
 
-/* Exterior neon light */
-
 const neon =
     new THREE.PointLight(
         0xb9d9ff,
@@ -900,7 +956,7 @@ const neon =
 neon.position.set(
     0,
     8.5,
-    dinerZ - 9
+    dinerZ-9
 );
 
 scene.add(neon);
@@ -915,13 +971,20 @@ const signCanvas =
         "canvas"
     );
 
-signCanvas.width = 1024;
-signCanvas.height = 220;
+signCanvas.width =
+    1024;
+
+signCanvas.height =
+    220;
 
 const ctx =
-    signCanvas.getContext("2d");
+    signCanvas.getContext(
+        "2d"
+    );
 
-ctx.fillStyle = "#111";
+ctx.fillStyle =
+    "#111";
+
 ctx.fillRect(
     0,
     0,
@@ -932,10 +995,14 @@ ctx.fillRect(
 ctx.font =
     "bold 120px Arial";
 
-ctx.textAlign = "center";
-ctx.textBaseline = "middle";
+ctx.textAlign =
+    "center";
 
-ctx.fillStyle = "#fff";
+ctx.textBaseline =
+    "middle";
+
+ctx.fillStyle =
+    "#fff";
 
 ctx.fillText(
     "NIGHTFALL DINER",
@@ -958,55 +1025,52 @@ const sign =
             .3
         ),
         new THREE.MeshStandardMaterial({
-            map: signTexture,
-            emissive: 0x8899aa,
-            emissiveIntensity: 1.5
+            map:signTexture,
+            emissive:0x8899aa,
+            emissiveIntensity:1.5
         })
     );
-
 
 sign.position.set(
     0,
     10,
-    dinerZ - 8.6
+    dinerZ-8.6
 );
 
 scene.add(sign);
 
 
 /* =========================================================
-   INTERACTABLE ITEMS
+   ITEMS
 ========================================================= */
 
 function registerItem(
     object,
     type,
     name
-) {
+){
 
     object.userData = {
-        type: type,
-        name: name
+        type:type,
+        name:name
     };
 
     interactables.push(
         object
     );
 
-    scene.add(object);
+    scene.add(
+        object
+    );
 
 }
 
-
-/* =========================================================
-   BATTERY
-========================================================= */
 
 function createBattery(
     x,
     y,
     z
-) {
+){
 
     const group =
         new THREE.Group();
@@ -1024,7 +1088,7 @@ function createBattery(
         );
 
     body.rotation.z =
-        Math.PI / 2;
+        Math.PI/2;
 
     group.add(body);
 
@@ -1041,7 +1105,7 @@ function createBattery(
         );
 
     cap.rotation.z =
-        Math.PI / 2;
+        Math.PI/2;
 
     cap.position.x =
         .4;
@@ -1065,15 +1129,11 @@ function createBattery(
 }
 
 
-/* =========================================================
-   CHICKEN
-========================================================= */
-
 function createChicken(
     x,
     y,
     z
-) {
+){
 
     const group =
         new THREE.Group();
@@ -1110,7 +1170,7 @@ function createChicken(
         );
 
     bone.rotation.z =
-        Math.PI / 2;
+        Math.PI/2;
 
     bone.position.x =
         .42;
@@ -1134,15 +1194,11 @@ function createChicken(
 }
 
 
-/* =========================================================
-   SPEAKER
-========================================================= */
-
 function createSpeaker(
     x,
     y,
     z
-) {
+){
 
     const group =
         new THREE.Group();
@@ -1193,51 +1249,15 @@ function createSpeaker(
 }
 
 
-/* Place items */
+createBattery(-13,1,-8);
+createBattery(12,1,-32);
+createBattery(-7,1,-52);
+createBattery(6,1,-72);
 
-createBattery(
-    -13,
-    1,
-    -8
-);
+createChicken(4,1.75,-57);
+createChicken(-4,1.75,-55);
 
-createBattery(
-    12,
-    1,
-    -32
-);
-
-createBattery(
-    -7,
-    1,
-    -52
-);
-
-createBattery(
-    6,
-    1,
-    -72
-);
-
-
-createChicken(
-    4,
-    1.75,
-    -57
-);
-
-createChicken(
-    -4,
-    1.75,
-    -55
-);
-
-
-createSpeaker(
-    10,
-    1.3,
-    -55
-);
+createSpeaker(10,1.3,-55);
 
 
 /* =========================================================
@@ -1248,16 +1268,14 @@ const hunter =
     new THREE.Group();
 
 
-const whiteMaterial =
+const white =
     material(
         0xf5f5f5,
         .75
     );
 
 
-/* Body */
-
-const hunterBody =
+const body =
     new THREE.Mesh(
         new THREE.CapsuleGeometry(
             .55,
@@ -1265,41 +1283,34 @@ const hunterBody =
             8,
             16
         ),
-        whiteMaterial
+        white
     );
 
-hunterBody.position.y = 2;
+body.position.y =
+    2;
 
-hunter.add(
-    hunterBody
-);
+hunter.add(body);
 
 
-/* Head */
-
-const hunterHead =
+const head =
     new THREE.Mesh(
         new THREE.SphereGeometry(
             .65,
             16,
             12
         ),
-        whiteMaterial
+        white
     );
 
-hunterHead.position.y =
+head.position.y =
     4.05;
 
-hunter.add(
-    hunterHead
-);
+hunter.add(head);
 
 
-/* Arms and legs */
-
-for (
-    const side of [-1, 1]
-) {
+for(
+    const side of [-1,1]
+){
 
     const arm =
         new THREE.Mesh(
@@ -1309,11 +1320,11 @@ for (
                 6,
                 10
             ),
-            whiteMaterial
+            white
         );
 
     arm.position.set(
-        side * .82,
+        side*.82,
         2.3,
         0
     );
@@ -1329,11 +1340,11 @@ for (
                 6,
                 10
             ),
-            whiteMaterial
+            white
         );
 
     leg.position.set(
-        side * .32,
+        side*.32,
         .2,
         0
     );
@@ -1352,7 +1363,7 @@ for (
         );
 
     eye.position.set(
-        side * .22,
+        side*.22,
         4.15,
         -.57
     );
@@ -1361,13 +1372,6 @@ for (
 
 }
 
-
-/*
-   Put the hunter in the forest.
-
-   White against the dark forest makes
-   it clearly visible.
-*/
 
 hunter.position.set(
     18,
@@ -1379,10 +1383,10 @@ scene.add(hunter);
 
 
 /* =========================================================
-   ITEM INTERACTION
+   INTERACTION
 ========================================================= */
 
-function interact() {
+function interact(){
 
     const forward =
         new THREE.Vector3(
@@ -1395,12 +1399,13 @@ function interact() {
 
 
     let closest = null;
-    let closestDistance = 3.2;
+
+    let distanceLimit = 3.2;
 
 
-    for (
+    for(
         const item of interactables
-    ) {
+    ){
 
         const distance =
             camera.position.distanceTo(
@@ -1415,15 +1420,15 @@ function interact() {
                 .normalize();
 
 
-        if (
-            distance < closestDistance &&
+        if(
+            distance < distanceLimit &&
             forward.dot(direction) > .45
-        ) {
+        ){
 
             closest =
                 item;
 
-            closestDistance =
+            distanceLimit =
                 distance;
 
         }
@@ -1431,23 +1436,20 @@ function interact() {
     }
 
 
-    if (!closest) {
+    if(!closest){
         return;
     }
 
 
-    const type =
-        closest.userData.type;
-
-
-    if (
-        type === "battery"
-    ) {
+    if(
+        closest.userData.type ===
+        "battery"
+    ){
 
         battery =
             Math.min(
                 100,
-                battery + 35
+                battery+35
             );
 
         setObjective(
@@ -1456,9 +1458,11 @@ function interact() {
 
     }
 
-    else if (
-        type === "chicken"
-    ) {
+
+    else if(
+        closest.userData.type ===
+        "chicken"
+    ){
 
         setObjective(
             "Chicken collected."
@@ -1466,9 +1470,11 @@ function interact() {
 
     }
 
-    else if (
-        type === "speaker"
-    ) {
+
+    else if(
+        closest.userData.type ===
+        "speaker"
+    ){
 
         setObjective(
             "Speaker collected. Something is playing..."
@@ -1501,10 +1507,10 @@ function interact() {
 
 
 /* =========================================================
-   INTERACTION PROMPT
+   PROMPT
 ========================================================= */
 
-function updatePrompt() {
+function updatePrompt(){
 
     const prompt =
         document.getElementById(
@@ -1525,9 +1531,9 @@ function updatePrompt() {
         );
 
 
-    for (
+    for(
         const item of interactables
-    ) {
+    ){
 
         const distance =
             camera.position.distanceTo(
@@ -1542,10 +1548,10 @@ function updatePrompt() {
                 .normalize();
 
 
-        if (
+        if(
             distance < 3.2 &&
             forward.dot(direction) > .45
-        ) {
+        ){
 
             prompt.textContent =
                 "[E] PICK UP " +
@@ -1565,61 +1571,399 @@ function updatePrompt() {
 
 
 /* =========================================================
-   OBJECTIVE
+   TOUCH LOOK
 ========================================================= */
 
-function setObjective(text) {
-
+const lookArea =
     document.getElementById(
-        "objective"
-    ).textContent = text;
+        "lookArea"
+    );
+
+let looking = false;
+
+let lastTouchX = 0;
+let lastTouchY = 0;
+
+
+lookArea.addEventListener(
+    "pointerdown",
+    event => {
+
+        looking = true;
+
+        lastTouchX =
+            event.clientX;
+
+        lastTouchY =
+            event.clientY;
+
+    }
+);
+
+
+lookArea.addEventListener(
+    "pointermove",
+    event => {
+
+        if(!looking){
+            return;
+        }
+
+
+        const dx =
+            event.clientX -
+            lastTouchX;
+
+        const dy =
+            event.clientY -
+            lastTouchY;
+
+
+        lastTouchX =
+            event.clientX;
+
+        lastTouchY =
+            event.clientY;
+
+
+        yaw -=
+            dx * .004;
+
+        pitch -=
+            dy * .003;
+
+
+        pitch =
+            Math.max(
+                -1.35,
+                Math.min(
+                    1.35,
+                    pitch
+                )
+            );
+
+    }
+);
+
+
+lookArea.addEventListener(
+    "pointerup",
+    () => {
+
+        looking = false;
+
+    }
+);
+
+lookArea.addEventListener(
+    "pointercancel",
+    () => {
+
+        looking = false;
+
+    }
+);
+
+
+/* =========================================================
+   JOYSTICK
+========================================================= */
+
+const joystick =
+    document.getElementById(
+        "joystick"
+    );
+
+const stick =
+    document.getElementById(
+        "stick"
+    );
+
+let joystickActive =
+    false;
+
+
+joystick.addEventListener(
+    "pointerdown",
+    event => {
+
+        joystickActive =
+            true;
+
+        joystick.setPointerCapture(
+            event.pointerId
+        );
+
+        updateJoystick(
+            event
+        );
+
+    }
+);
+
+
+joystick.addEventListener(
+    "pointermove",
+    event => {
+
+        if(
+            joystickActive
+        ){
+
+            updateJoystick(
+                event
+            );
+
+        }
+
+    }
+);
+
+
+joystick.addEventListener(
+    "pointerup",
+    resetJoystick
+);
+
+joystick.addEventListener(
+    "pointercancel",
+    resetJoystick
+);
+
+
+function updateJoystick(
+    event
+){
+
+    const rect =
+        joystick.getBoundingClientRect();
+
+
+    const centerX =
+        rect.left +
+        rect.width/2;
+
+    const centerY =
+        rect.top +
+        rect.height/2;
+
+
+    let dx =
+        event.clientX -
+        centerX;
+
+    let dy =
+        event.clientY -
+        centerY;
+
+
+    const max =
+        55;
+
+
+    const length =
+        Math.sqrt(
+            dx*dx +
+            dy*dy
+        );
+
+
+    if(
+        length > max
+    ){
+
+        dx =
+            dx/length*max;
+
+        dy =
+            dy/length*max;
+
+    }
+
+
+    stick.style.transform =
+        `translate(${dx}px,${dy}px)`;
+
+
+    moveX =
+        dx/max;
+
+    moveY =
+        dy/max;
+
+}
+
+
+function resetJoystick(){
+
+    joystickActive =
+        false;
+
+    stick.style.transform =
+        "translate(0,0)";
+
+    moveX = 0;
+    moveY = 0;
 
 }
 
 
 /* =========================================================
-   PLAYER MOVEMENT
+   MOBILE BUTTONS
 ========================================================= */
 
-function movement(dt) {
+document.getElementById(
+    "flashButton"
+).addEventListener(
+    "pointerdown",
+    event => {
 
-    const speed = 6;
+        event.preventDefault();
+
+        flashlightOn =
+            !flashlightOn;
+
+    }
+);
 
 
-    if (keys.KeyW) {
+document.getElementById(
+    "interactButton"
+).addEventListener(
+    "pointerdown",
+    event => {
 
-        controls.moveForward(
-            speed * dt
-        );
+        event.preventDefault();
 
+        interact();
+
+    }
+);
+
+
+/* =========================================================
+   DESKTOP KEYBOARD
+========================================================= */
+
+const keys = {};
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        keys[event.code] =
+            true;
+
+
+        if(
+            event.code === "KeyF"
+        ){
+
+            flashlightOn =
+                !flashlightOn;
+
+        }
+
+
+        if(
+            event.code === "KeyE"
+        ){
+
+            interact();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    event => {
+
+        keys[event.code] =
+            false;
+
+    }
+);
+
+
+/* =========================================================
+   MOVEMENT
+========================================================= */
+
+function movement(
+    dt
+){
+
+    let forward = 0;
+
+    let right = 0;
+
+
+    if(keys.KeyW){
+        forward += 1;
+    }
+
+    if(keys.KeyS){
+        forward -= 1;
+    }
+
+    if(keys.KeyD){
+        right += 1;
+    }
+
+    if(keys.KeyA){
+        right -= 1;
     }
 
 
-    if (keys.KeyS) {
+    forward +=
+        -moveY;
 
-        controls.moveForward(
-            -speed * dt
+    right +=
+        moveX;
+
+
+    const direction =
+        new THREE.Vector3(
+            0,
+            0,
+            -1
         );
 
-    }
+    direction.applyAxisAngle(
+        new THREE.Vector3(0,1,0),
+        yaw
+    );
 
 
-    if (keys.KeyA) {
-
-        controls.moveRight(
-            -speed * dt
+    const rightDirection =
+        new THREE.Vector3(
+            1,
+            0,
+            0
         );
 
-    }
+    rightDirection.applyAxisAngle(
+        new THREE.Vector3(0,1,0),
+        yaw
+    );
 
 
-    if (keys.KeyD) {
+    camera.position.add(
+        direction.multiplyScalar(
+            forward * 6 * dt
+        )
+    );
 
-        controls.moveRight(
-            speed * dt
-        );
 
-    }
+    camera.position.add(
+        rightDirection.multiplyScalar(
+            right * 6 * dt
+        )
+    );
 
 
     camera.position.y =
@@ -1649,10 +1993,44 @@ function movement(dt) {
 
 
 /* =========================================================
-   MAIN LOOP
+   CAMERA
 ========================================================= */
 
-function animate() {
+function updateCamera(){
+
+    camera.rotation.order =
+        "YXZ";
+
+    camera.rotation.y =
+        yaw;
+
+    camera.rotation.x =
+        pitch;
+
+}
+
+
+/* =========================================================
+   OBJECTIVE
+========================================================= */
+
+function setObjective(
+    text
+){
+
+    document.getElementById(
+        "objective"
+    ).textContent =
+        text;
+
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function animate(){
 
     requestAnimationFrame(
         animate
@@ -1666,33 +2044,33 @@ function animate() {
         );
 
 
-    if (
-        controls.isLocked
-    ) {
+    if(gameStarted){
 
         movement(dt);
 
+        updateCamera();
+
 
         /*
-           100% -> 0%
-           over approximately FIVE MINUTES
-           of continuous flashlight use.
+           Full battery lasts
+           approximately five minutes
+           of continuous use.
         */
 
-        if (
+        if(
             flashlightOn &&
             battery > 0
-        ) {
+        ){
 
             battery -=
                 100 /
-                (5 * 60) *
+                (5*60) *
                 dt;
 
 
-            if (
+            if(
                 battery < 0
-            ) {
+            ){
 
                 battery = 0;
 
@@ -1711,16 +2089,15 @@ function animate() {
     document.getElementById(
         "batteryText"
     ).textContent =
-        Math.ceil(battery) + "%";
+        Math.ceil(
+            battery
+        ) + "%";
 
 
     document.getElementById(
         "batteryFill"
     ).style.width =
-        Math.max(
-            0,
-            battery
-        ) + "%";
+        battery + "%";
 
 
     renderer.render(
@@ -1735,39 +2112,22 @@ animate();
 
 
 /* =========================================================
-   START GAME
+   START BUTTON
 ========================================================= */
 
 document.getElementById(
     "startButton"
-).onclick = () => {
-
-    controls.lock();
-
-};
-
-
-controls.addEventListener(
-    "lock",
+).addEventListener(
+    "click",
     () => {
+
+        gameStarted =
+            true;
 
         document.getElementById(
             "startScreen"
         ).style.display =
             "none";
-
-    }
-);
-
-
-controls.addEventListener(
-    "unlock",
-    () => {
-
-        document.getElementById(
-            "startScreen"
-        ).style.display =
-            "flex";
 
     }
 );
